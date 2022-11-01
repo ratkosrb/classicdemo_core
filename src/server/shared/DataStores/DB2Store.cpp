@@ -94,16 +94,8 @@ bool DB2StorageBase::Load(std::string const& path, uint32 locale, char**& indexT
     {
         DB2FileSystemSource source(path + _fileName);
         // Check if load was successful, only then continue
-        try
-        {
-            db2.Load(&source, _loadInfo);
-            return true;
-        }
-        catch (std::exception const& e)
-        {
-            TC_LOG_ERROR("misc", "An exception happend while loading '%s'\n%s", _fileName, e.what());
+        if (!db2.Load(&source, _loadInfo))
             return false;
-        }
     }
 
     _fieldCount = db2.GetCols();
@@ -134,16 +126,8 @@ bool DB2StorageBase::LoadStringsFrom(std::string const& path, uint32 locale, cha
     {
         DB2FileSystemSource source(path + _fileName);
         // Check if load was successful, only then continue
-        try
-        {
-            db2.Load(&source, _loadInfo);
+        if (!db2.Load(&source, _loadInfo))
             return false;
-        }
-        catch (std::exception const& e)
-        {
-            //TC_LOG_ERROR("misc", "An exception happend while loading '%s'\n%s", _fileName, e.what());
-            return false;
-        }
     }
 
     // load strings from another locale db2 data

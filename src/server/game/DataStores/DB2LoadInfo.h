@@ -4731,10 +4731,8 @@ struct SpellRangeLoadInfo
             { false, FT_INT, "ID" },
             { false, FT_STRING, "DisplayName" },
             { false, FT_STRING, "DisplayNameShort" },
-            { false, FT_FLOAT, "RangeMin1" },
-            { false, FT_FLOAT, "RangeMin2" },
-            { false, FT_FLOAT, "RangeMax1" },
-            { false, FT_FLOAT, "RangeMax2" },
+            { false, FT_FLOAT, "RangeMin" },
+            { false, FT_FLOAT, "RangeMax" },
             { false, FT_BYTE, "Flags" },
         };
         static DB2LoadInfo const loadInfo(&fields[0], std::extent<decltype(fields)>::value, SpellRangeMeta::Instance(), HOTFIX_SEL_SPELL_RANGE);

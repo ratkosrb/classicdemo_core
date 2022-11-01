@@ -5602,7 +5602,7 @@ struct SpellRangeMeta
     static DB2Meta const* Instance()
     {
         static char const* types = "ssffb";
-        static uint8 const arraySizes[5] = { 1, 1, 2, 2, 1 };
+        static uint8 const arraySizes[5] = { 1, 1, 1, 1, 1 };
         static DB2Meta instance(-1, 5, 0xDE2E3F8E, types, arraySizes, -1);
         return &instance;
     }

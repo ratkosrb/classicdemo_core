@@ -2394,7 +2394,7 @@ struct SkillLineAbilityEntry
     uint32 ID;
     int32 Spell;
     int32 SupercedesSpell;
-    std::array<int32, 2> CharacterPoints;
+    int32 CharacterPoints[2];
     int16 SkillLine;
     int16 TrivialSkillLineRankHigh;
     int16 TrivialSkillLineRankLow;
@@ -2746,8 +2746,8 @@ struct SpellRangeEntry
     uint32 ID;
     LocalizedString* DisplayName;
     LocalizedString* DisplayNameShort;
-    float RangeMin[2];
-    float RangeMax[2];
+    float RangeMin;
+    float RangeMax;
     uint8 Flags;
 };
 
@@ -2861,12 +2861,12 @@ struct TalentEntry
     LocalizedString* Description;
     uint32 SpellID;
     uint32 OverridesSpellID;
-    std::array<uint32, 9> SpellRank;
+    uint32 SpellRank[9];
     int32 RequiredSpellID;
     uint16 SpecID;
     uint16 TabID;
-    std::array<uint16, 3> PrereqTalent;
-    std::array<uint16, 3> PrereqRank;
+    uint16 PrereqTalent[3];
+    uint16 PrereqRank[3];
     uint8 TierID;
     uint8 ColumnIndex;
     uint8 Flags;
