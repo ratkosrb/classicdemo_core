@@ -113,7 +113,7 @@ void LoadGameTables(std::string const& dataPath)
     LOAD_GT(sArmorMitigationByLvlGameTable, "ArmorMitigationByLvl.txt");
     LOAD_GT(sArtifactKnowledgeMultiplierGameTable, "ArtifactKnowledgeMultiplier.txt");
     LOAD_GT(sArtifactLevelXPGameTable, "ArtifactLevelXP.txt");
-    LOAD_GT(sBarberShopCostBaseGameTable, "BarberShopCostBase.txt");
+    //LOAD_GT(sBarberShopCostBaseGameTable, "BarberShopCostBase.txt"); // not exist
     LOAD_GT(sBaseMPGameTable, "BaseMp.txt");
     LOAD_GT(sCombatRatingsGameTable, "CombatRatings.txt");
     LOAD_GT(sCombatRatingsMultByILvlGameTable, "CombatRatingsMultByILvl.txt");
