@@ -736,7 +736,7 @@ struct TC_GAME_API ItemTemplate
     int32 GetItemStatAllocation(uint32 index) const { ASSERT(index < MAX_ITEM_PROTO_STATS); return ExtendedData->StatPercentEditor[index]; }
     float GetItemStatSocketCostMultiplier(uint32 index) const { ASSERT(index < MAX_ITEM_PROTO_STATS); return ExtendedData->StatPercentageOfSocket[index]; }
     uint32 GetScalingStatDistribution() const { return ExtendedData->ScalingStatDistributionID; }
-    uint32 GetDamageType() const { return ExtendedData->DamageDamageType; }
+    uint32 GetDamageType() const { return ExtendedData->DamageType[5]; }
     uint32 GetDelay() const { return ExtendedData->ItemDelay; }
     float GetRangedModRange() const { return ExtendedData->ItemRange; }
     ItemBondingType GetBonding() const { return ItemBondingType(ExtendedData->Bonding); }

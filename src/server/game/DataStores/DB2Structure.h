@@ -470,6 +470,7 @@ struct ChrClassesEntry
     uint8 AttackPowerPerAgility;
     uint8 RangedAttackPowerPerAgility;
     uint8 PrimaryStatPriority;
+    uint8 HasRelicSlot;
     uint32 ID;
 };
 
@@ -564,7 +565,7 @@ struct CinematicSequencesEntry
 
 struct ConversationLineEntry
 {
-    uint32 ID;
+    int32 ID;
     uint32 BroadcastTextID;
     uint32 SpellVisualKitID;
     int32 AdditionalDuration;
@@ -1353,6 +1354,7 @@ struct ItemEntry
 {
     uint32 ID;
     int32 IconFileDataID;
+    uint16 DisplayInfoID;
     uint8 ClassID;
     uint8 SubclassID;
     int8 SoundOverrideSubclassID;
@@ -1653,6 +1655,7 @@ struct ItemSparseEntry
     float PriceRandomValue;
     float PriceVariance;
     uint32 VendorStackCount;
+    uint32 MaxDurability;
     uint32 BuyPrice;
     uint32 SellPrice;
     uint32 RequiredAbility;
@@ -1672,6 +1675,9 @@ struct ItemSparseEntry
     uint16 MinFactionID;
     int16 ItemStatValue[MAX_ITEM_PROTO_STATS];
     uint16 ScalingStatDistributionID;
+    std::array<uint16, 5> MinDamage; //
+    std::array<uint16, 5> MaxDamage;
+    std::array<int16, 7> Resistances;
     uint16 ItemDelay;
     uint16 PageID;
     uint16 StartQuestID;
@@ -1696,7 +1702,8 @@ struct ItemSparseEntry
     uint8 MinReputation;
     uint8 ContainerSlots;
     int8 StatModifierBonusStat[MAX_ITEM_PROTO_STATS];
-    uint8 DamageDamageType;
+    std::array<uint8, 5> DamageType; //
+    uint8 AmmunitionType; //
     uint8 Bonding;
     uint8 LanguageID;
     uint8 PageMaterialID;
@@ -2141,16 +2148,16 @@ struct PowerTypeEntry
     uint32 ID;
     char const* NameGlobalStringTag;
     char const* CostGlobalStringTag;
+    uint32 MaxBasePower;
     float RegenPeace;
     float RegenCombat;
-    int16 MaxBasePower;
+    uint16 DisplayModifier;
     int16 RegenInterruptTimeMS;
     int16 Flags;
     int8 PowerTypeEnum;
     int8 MinPower;
     int8 CenterPower;
     int8 DefaultPower;
-    int8 DisplayModifier;
 };
 
 struct PrestigeLevelInfoEntry
@@ -2387,6 +2394,7 @@ struct SkillLineAbilityEntry
     uint32 ID;
     int32 Spell;
     int32 SupercedesSpell;
+    std::array<int32, 2> CharacterPoints;
     int16 SkillLine;
     int16 TrivialSkillLineRankHigh;
     int16 TrivialSkillLineRankLow;
@@ -2448,6 +2456,7 @@ struct SpellEntry
     LocalizedString* NameSubtext;
     LocalizedString* Description;
     LocalizedString* AuraDescription;
+    int32 CastUI;
 };
 
 struct SpellAuraOptionsEntry
@@ -2852,7 +2861,12 @@ struct TalentEntry
     LocalizedString* Description;
     uint32 SpellID;
     uint32 OverridesSpellID;
+    std::array<uint32, 9> SpellRank;
+    int32 RequiredSpellID;
     uint16 SpecID;
+    uint16 TabID;
+    std::array<uint16, 3> PrereqTalent;
+    std::array<uint16, 3> PrereqRank;
     uint8 TierID;
     uint8 ColumnIndex;
     uint8 Flags;

@@ -517,7 +517,7 @@ void DB2Manager::LoadStores(std::string const& dataPath, uint32 defaultLocale)
     LOAD_DB2(sChrSpecializationStore);
     LOAD_DB2(sCinematicCameraStore);
     LOAD_DB2(sCinematicSequencesStore);
-    LOAD_DB2(sConversationLineStore);
+    //LOAD_DB2(sConversationLineStore); // Empty 1.13
     LOAD_DB2(sCreatureDisplayInfoStore);
     LOAD_DB2(sCreatureDisplayInfoExtraStore);
     LOAD_DB2(sCreatureFamilyStore);
@@ -650,7 +650,7 @@ void DB2Manager::LoadStores(std::string const& dataPath, uint32 defaultLocale)
     LOAD_DB2(sSceneScriptStore);
     LOAD_DB2(sSceneScriptGlobalTextStore);
     LOAD_DB2(sSceneScriptPackageStore);
-    LOAD_DB2(sSceneScriptTextStore);
+    //LOAD_DB2(sSceneScriptTextStore); // empty 1.13
     LOAD_DB2(sSkillLineStore);
     LOAD_DB2(sSkillLineAbilityStore);
     LOAD_DB2(sSkillRaceClassInfoStore);
@@ -1147,16 +1147,16 @@ void DB2Manager::LoadStores(std::string const& dataPath, uint32 defaultLocale)
     }
 
     // Check loaded DB2 files proper version
-    if (!sAreaTableStore.LookupEntry(9531) ||                // last area added in 7.3.5 (25996)
-        !sCharTitlesStore.LookupEntry(522) ||                // last char title added in 7.3.5 (25996)
-        !sGemPropertiesStore.LookupEntry(3632) ||            // last gem property added in 7.3.5 (25996)
-        !sItemStore.LookupEntry(157831) ||                   // last item added in 7.3.5 (25996)
-        !sItemExtendedCostStore.LookupEntry(6300) ||         // last item extended cost added in 7.3.5 (25996)
-        !sMapStore.LookupEntry(1903) ||                      // last map added in 7.3.5 (25996)
-        !sSpellStore.LookupEntry(263166))                    // last spell added in 7.3.5 (25996)
+    if (!sAreaTableStore.LookupEntry(3486) ||                // last area added in 1.13.0 (28211)
+        //!sCharTitlesStore.LookupEntry(522) ||                // empy at 1.13.0
+        //!sGemPropertiesStore.LookupEntry(3632) ||            // empty at 1.13.0
+        !sItemStore.LookupEntry(24358) ||                   // last item added in 1.13.0 (28211)
+        //!sItemExtendedCostStore.LookupEntry(6300) ||         // empty 1.13.0
+        !sMapStore.LookupEntry(533) ||                      // last map added in 1.13.0 (28211)
+        !sSpellStore.LookupEntry(285224))                    // last spell added in 1.13.0 (28211)
     {
         TC_LOG_ERROR("misc", "You have _outdated_ DB2 files. Please extract correct versions from current using client.");
-        exit(1);
+        //exit(1);
     }
 
     TC_LOG_INFO("server.loading", ">> Initialized " SZFMTD " DB2 data stores in %u ms", _stores.size(), GetMSTimeDiffToNow(oldMSTime));

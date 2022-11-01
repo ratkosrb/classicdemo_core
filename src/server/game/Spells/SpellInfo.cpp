@@ -1662,7 +1662,7 @@ bool SpellInfo::CanPierceImmuneAura(SpellInfo const* auraSpellInfo) const
         if (!auraSpellInfo ||
             (auraSpellInfo->Mechanic != MECHANIC_IMMUNE_SHIELD &&
                 auraSpellInfo->Mechanic != MECHANIC_INVULNERABILITY &&
-                (auraSpellInfo->Mechanic != MECHANIC_BANISH))
+                (auraSpellInfo->Mechanic != MECHANIC_BANISH)))
             return true;
     }
 
