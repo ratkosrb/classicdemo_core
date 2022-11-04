@@ -685,13 +685,6 @@ bool Player::Create(ObjectGuid::LowType guidlow, WorldPackets::Character::Charac
             }
         }
     }
-    // all item positions resolved
-
-    if (ChrSpecializationEntry const* defaultSpec = sDB2Manager.GetDefaultChrSpecializationForClass(getClass()))
-    {
-        SetActiveTalentGroup(defaultSpec->OrderIndex);
-        SetPrimarySpecialization(defaultSpec->ID);
-    }
 
     return true;
 }
@@ -2514,7 +2507,7 @@ void Player::GiveLevel(uint8 level)
 
 void Player::InitTalentForLevel()
 {
-    uint8 level = getLevel();
+    /*uint8 level = getLevel();
     // talents base at level diff (talents = level - 9 but some can be used already)
     if (level < MIN_SPECIALIZATION_LEVEL)
         ResetTalentSpecialization();
@@ -2537,7 +2530,7 @@ void Player::InitTalentForLevel()
     SetUInt32Value(PLAYER_FIELD_MAX_TALENT_TIERS, talentTiers);
 
     if (!GetSession()->PlayerLoading())
-        SendTalentsInfoData(); // update at client
+        SendTalentsInfoData(); // update at client*/
 }
 
 void Player::InitStatsForLevel(bool reapplyMods)
@@ -18143,7 +18136,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
 
     SetPrimarySpecialization(fields[36].GetUInt32());
     SetActiveTalentGroup(fields[64].GetUInt8());
-    ChrSpecializationEntry const* primarySpec = sChrSpecializationStore.LookupEntry(GetPrimarySpecialization());
+    /*ChrSpecializationEntry const* primarySpec = sChrSpecializationStore.LookupEntry(GetPrimarySpecialization());
     if (!primarySpec || primarySpec->ClassID != getClass() || GetActiveTalentGroup() >= MAX_SPECIALIZATIONS)
         ResetTalentSpecialization();
 
@@ -18152,8 +18145,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
         if (chrSpec->ClassID == getClass())
             SetLootSpecId(lootSpecId);
 
-    if (ChrSpecializationEntry const* spec = sDB2Manager.GetChrSpecializationByIndex(getClass(), GetActiveTalentGroup()))
-        SetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID, spec->ID);
+    if (ChrSpecializationEntry const* spec = sDB2Manager.GetChrSpecializationByIndex(getClass(), GetActiveTalentGroup()))*/
+        SetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID, 0);
 
     UpdateDisplayPower();
     _LoadTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
@@ -26511,7 +26504,7 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
 
 void Player::SendTalentsInfoData()
 {
-    WorldPackets::Talent::UpdateTalentData packet;
+    /*WorldPackets::Talent::UpdateTalentData packet;
     packet.Info.PrimarySpecialization = GetPrimarySpecialization();
     packet.Info.ActiveGroup = GetActiveTalentGroup();
 
@@ -26586,7 +26579,21 @@ void Player::SendTalentsInfoData()
         packet.Info.TalentGroups.push_back(groupInfoPkt);
     }
 
-    SendDirectMessage(packet.Write());
+    SendDirectMessage(packet.Write());*/
+
+    WorldPackets::Talent::TalentGroupInfo groupInfo;
+    /*for (std::size_t i = 0; i < 4; ++i)
+    {
+        WorldPackets::Talent::PvPTalent pvpTalent;
+        pvpTalent.Slot = i;
+
+        groupInfo.PvPTalents.push_back(pvpTalent);
+    }*/
+
+    WorldPackets::Talent::UpdateTalentData updateTalent;
+    updateTalent.Info.TalentGroups.push_back(groupInfo);
+
+    SendDirectMessage(updateTalent.Write());
 }
 
 void Player::SendEquipmentSetList()

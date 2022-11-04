@@ -246,7 +246,7 @@ enum OpcodeClient : uint16
     CMSG_CONVERSATION_LINE_STARTED                    = 0x354A,
     CMSG_CONVERT_CONSUMPTION_TIME                     = 0x36F9,
     CMSG_CONVERT_RAID                                 = 0x364E,
-    CMSG_CREATE_CHARACTER                             = 0x3643,
+    CMSG_CREATE_CHARACTER                             = 0x3642, //
     CMSG_CREATE_SHIPMENT                              = 0x32E0,
     CMSG_DB_QUERY_BULK                                = 0x35E4,
     CMSG_DECLINE_GUILD_INVITES                        = 0x3522,
@@ -732,7 +732,7 @@ enum OpcodeClient : uint16
     CMSG_UNLEARN_SKILL                                = 0x34E9,
     CMSG_UNLEARN_SPECIALIZATION                       = 0x31A0,
     CMSG_UNLOCK_VOID_STORAGE                          = 0x319C,
-    CMSG_UPDATE_ACCOUNT_DATA                          = 0x3696,
+    CMSG_UPDATE_ACCOUNT_DATA                          = 0x3696, //UNKNOWN OPCODE 0x3698 - need more test
     CMSG_UPDATE_AREA_TRIGGER_VISUAL                   = 0x3290,
     CMSG_UPDATE_CLIENT_SETTINGS                       = 0x3664,
     CMSG_UPDATE_MISSILE_TRAJECTORY                    = 0x3A3E,
