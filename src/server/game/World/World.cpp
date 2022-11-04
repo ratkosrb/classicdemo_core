@@ -1536,10 +1536,7 @@ void World::SetInitialWorldSettings()
         || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
         || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
         || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
-        || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
-        || (m_int_configs[CONFIG_EXPANSION] && (
-            !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-            !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+        || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f))
     {
         TC_LOG_FATAL("server.loading", "Unable to load critical files - server shutting down !!!");
         exit(1);
@@ -2148,8 +2145,8 @@ void World::SetInitialWorldSettings()
     sOutdoorPvPMgr->InitOutdoorPvP();
 
     ///- Initialize Battlefield
-    TC_LOG_INFO("server.loading", "Starting Battlefield System");
-    sBattlefieldMgr->InitBattlefield();
+    TC_LOG_INFO("server.loading", "Starting Battlefield System (TEMP DISABLED)");
+    //sBattlefieldMgr->InitBattlefield();
 
     TC_LOG_INFO("server.loading", "Loading Transports...");
     sTransportMgr->SpawnContinentTransports();

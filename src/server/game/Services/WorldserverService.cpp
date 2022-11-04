@@ -49,9 +49,9 @@ uint32 Battlenet::GameUtilitiesService::HandleProcessClientRequest(game_utilitie
         return ERROR_RPC_MALFORMED_REQUEST;
     }
 
-    if (command->name() == "Command_RealmListRequest_v1_b9")
+    if (command->name() == "Command_RealmListRequest_v1_classic1")
         return HandleRealmListRequest(params, response);
-    else if (command->name() == "Command_RealmJoinRequest_v1_b9")
+    else if (command->name() == "Command_RealmJoinRequest_v1_classic1")
         return HandleRealmJoinRequest(params, response);
 
     return ERROR_RPC_NOT_IMPLEMENTED;
@@ -60,7 +60,7 @@ uint32 Battlenet::GameUtilitiesService::HandleProcessClientRequest(game_utilitie
 uint32 Battlenet::GameUtilitiesService::HandleRealmListRequest(std::unordered_map<std::string, Variant const*> params, game_utilities::v1::ClientResponse* response)
 {
     std::string subRegionId;
-    auto subRegion = params.find("Command_RealmListRequest_v1_b9");
+    auto subRegion = params.find("Command_RealmListRequest_v1_classic1");
     if (subRegion != params.end())
         subRegionId = subRegion->second->string_value();
 
@@ -109,7 +109,7 @@ uint32 Battlenet::GameUtilitiesService::HandleRealmJoinRequest(std::unordered_ma
 
 uint32 Battlenet::GameUtilitiesService::HandleGetAllValuesForAttribute(game_utilities::v1::GetAllValuesForAttributeRequest const* request, game_utilities::v1::GetAllValuesForAttributeResponse* response, std::function<void(ServiceBase*, uint32, ::google::protobuf::Message const*)>& /*continuation*/)
 {
-    if (request->attribute_key() == "Command_RealmListRequest_v1_b9")
+    if (request->attribute_key() == "Command_RealmListRequest_v1_classic1")
     {
         sRealmList->WriteSubRegions(response);
         return ERROR_OK;

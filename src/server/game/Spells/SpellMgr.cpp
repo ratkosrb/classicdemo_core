@@ -648,7 +648,8 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
     }
 
     // Extra conditions
-    switch (spellId)
+    //TODO Remove Later / not exist at 1.13
+    /*switch (spellId)
     {
         case 91604: // No fly Zone - Wintergrasp
         {
@@ -700,7 +701,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             break;
         }
 
-    }
+    }*/
 
     return true;
 }
