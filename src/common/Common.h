@@ -42,7 +42,9 @@
 
 #if TRINITY_COMPILER == TRINITY_COMPILER_MICROSOFT
 
-#define snprintf _snprintf
+#if _MSC_VER < 1900
+#  define snprintf _snprintf
+#endif
 #define atoll _atoi64
 #define vsnprintf _vsnprintf
 #define llabs _abs64

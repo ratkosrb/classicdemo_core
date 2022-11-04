@@ -41,7 +41,9 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN  // We only need minimal includes
 #include <windows.h>
-#define snprintf _snprintf    // see comment in strutil.cc
+#if _MSC_VER < 1900
+#  define snprintf _snprintf
+#endif
 #elif defined(HAVE_PTHREAD)
 #include <pthread.h>
 #else
