@@ -23726,38 +23726,19 @@ void Player::SendInitialPacketsBeforeAddToMap()
     loginSetTimeSpeed.ServerTimeHolidayOffset = 0; /// @todo
     SendDirectMessage(loginSetTimeSpeed.Write());
 
+    //TEMP DISABLED DUE FIND WHY IT CRASH SERVER
     /// SMSG_WORLD_SERVER_INFO
-    WorldPackets::Misc::WorldServerInfo worldServerInfo;
+    /*WorldPackets::Misc::WorldServerInfo worldServerInfo;
     worldServerInfo.InstanceGroupSize = GetMap()->GetMapDifficulty()->MaxPlayers;
     worldServerInfo.IsTournamentRealm = 0; /// @todo
     // worldServerInfo.RestrictedAccountMaxLevel; /// @todo
     // worldServerInfo.RestrictedAccountMaxMoney; /// @todo
     worldServerInfo.DifficultyID = GetMap()->GetDifficultyID();
     // worldServerInfo.XRealmPvpAlert;  /// @todo
-    SendDirectMessage(worldServerInfo.Write());
+    SendDirectMessage(worldServerInfo.Write());*/
 
     // Spell modifiers
     SendSpellModifiers();
-
-    // SMSG_ACCOUNT_MOUNT_UPDATE
-    WorldPackets::Misc::AccountMountUpdate mountUpdate;
-    mountUpdate.IsFullUpdate = true;
-    mountUpdate.Mounts = &GetSession()->GetCollectionMgr()->GetAccountMounts();
-    SendDirectMessage(mountUpdate.Write());
-
-    // SMSG_ACCOUNT_TOYS_UPDATE
-    WorldPackets::Toy::AccountToysUpdate toysUpdate;
-    toysUpdate.IsFullUpdate = true;
-    toysUpdate.Toys = &GetSession()->GetCollectionMgr()->GetAccountToys();
-    SendDirectMessage(toysUpdate.Write());
-
-    // SMSG_ACCOUNT_HEIRLOOM_UPDATE
-    WorldPackets::Misc::AccountHeirloomUpdate heirloomUpdate;
-    heirloomUpdate.IsFullUpdate = true;
-    heirloomUpdate.Heirlooms = &GetSession()->GetCollectionMgr()->GetAccountHeirlooms();
-    SendDirectMessage(heirloomUpdate.Write());
-
-    GetSession()->GetCollectionMgr()->SendFavoriteAppearances();
 
     WorldPackets::Character::InitialSetup initialSetup;
     initialSetup.ServerExpansionLevel = sWorld->getIntConfig(CONFIG_EXPANSION);
@@ -23828,7 +23809,7 @@ void Player::SendInitialPacketsAfterAddToMap()
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
 
-    if (GetMap()->IsRaid())
+    /*if (GetMap()->IsRaid())
     {
         m_prevMapDifficulty = GetMap()->GetDifficultyID();
         DifficultyEntry const* difficulty = sDifficultyStore.AssertEntry(m_prevMapDifficulty);
@@ -23845,7 +23826,7 @@ void Player::SendInitialPacketsAfterAddToMap()
         SendRaidDifficulty((difficulty->Flags & DIFFICULTY_FLAG_LEGACY) != 0);
     }
 
-    PhasingHandler::OnMapChange(this);
+    PhasingHandler::OnMapChange(this);*/
 
     if (_garrison)
         _garrison->SendRemoteInfo();

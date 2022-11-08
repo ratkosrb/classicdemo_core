@@ -48,7 +48,7 @@ namespace Connection_Patcher
     namespace
     {
         template<typename PATCH, typename PATTERN>
-        void do_patches(Patcher* patcher, boost::filesystem::path output, uint32_t buildNumber)
+        void do_patches(Patcher* patcher, boost::filesystem::path output)
         {
             std::cout << "patching Portal\n";
             // '.actual.battle.net' -> '' to allow for set portal 'host'
@@ -73,9 +73,9 @@ namespace Connection_Patcher
             // this is good practice with or without the retail version, just to stop the exe from auto-patching randomly
             // hardcode %s.patch.battle.net:1119/%s/versions to trinity6.github.io/%s/%s/build/versi
             std::string verPatch(Patches::Common::VersionsFile());
-            std::string buildPattern = "build";
+            //std::string buildPattern = "build";
 
-            boost::algorithm::replace_all(verPatch, buildPattern, std::to_string(buildNumber));
+            //boost::algorithm::replace_all(verPatch);
             std::vector<unsigned char> verVec(verPatch.begin(), verPatch.end());
             patcher->Patch(verVec, Patterns::Common::VersionsFile());
 
@@ -187,13 +187,13 @@ int main(int argc, char** argv)
         Patcher patcher(binary_path);
 
         // always set wowBuild to current build of the .exe files
-        int wowBuild = Helper::GetBuildNumber(patcher.GetBinary());
+        //int wowBuild = Helper::GetBuildNumber(patcher.GetBinary());
 
         // define logical limits in case the exe was tinkered with and the build number was changed
-        if (wowBuild == 0 || wowBuild < 10000 || wowBuild > 65535) // Build number has to be exactly 5 characters long
-            throw std::runtime_error("Build number was out of range. Build: " + std::to_string(wowBuild));
+        //if (wowBuild == 0 || wowBuild < 10000 || wowBuild > 65535) // Build number has to be exactly 5 characters long
+            //throw std::runtime_error("Build number was out of range. Build: " + std::to_string(wowBuild));
 
-        std::cout << "Determined build number: " << std::to_string(wowBuild) << std::endl;
+        //std::cout << "Determined build number: " << std::to_string(wowBuild) << std::endl;
 
         switch (patcher.GetType())
         {
@@ -203,7 +203,7 @@ int main(int argc, char** argv)
 
                 boost::algorithm::replace_all(renamed_binary_path, ".exe", "_Patched.exe");
                 do_patches<Patches::Windows, Patterns::Windows>
-                    (&patcher, renamed_binary_path, wowBuild);
+                    (&patcher, renamed_binary_path);
                 WriteCertificateBundle(boost::filesystem::path(appDataPath) / L"Blizzard Entertainment/Battle.net/Cache/web_cert_bundle");
                 break;
             case Constants::BinaryTypes::Mach64:
@@ -215,7 +215,7 @@ int main(int argc, char** argv)
                         );
 
                 do_patches<Patches::Mac, Patterns::Mac>
-                    (&patcher, renamed_binary_path, wowBuild);
+                    (&patcher, renamed_binary_path);
 
                 {
                     namespace fs = boost::filesystem;

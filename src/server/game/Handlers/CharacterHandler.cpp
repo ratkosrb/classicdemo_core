@@ -985,7 +985,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
     //Show cinematic at the first time that player login
-    if (!pCurrChar->getCinematic())
+    /*if (!pCurrChar->getCinematic())
     {
         pCurrChar->setCinematic(1);
 
@@ -1002,7 +1002,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
             if (!sWorld->GetNewCharString().empty())
                 chH.PSendSysMessage("%s", sWorld->GetNewCharString().c_str());
         }
-    }
+    }*/
 
     if (!pCurrChar->GetMap()->AddPlayerToMap(pCurrChar))
     {
