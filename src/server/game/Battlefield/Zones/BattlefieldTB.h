@@ -657,8 +657,6 @@ class TC_GAME_API BattlefieldTB : public Battlefield
         void UpdateCapturedBaseCount();
         //void UpdatedDestroyedTowerCount(TeamId team);
 
-        //void DoCompleteOrIncrementAchievement(uint32 achievement, Player* player, uint8 incrementNumber = 1) override;
-
         bool SetupBattlefield() override;
 
         void SendInitWorldStatesTo(Player* player);

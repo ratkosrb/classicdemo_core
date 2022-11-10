@@ -26,25 +26,6 @@
 
 struct LocalizedString;
 
-struct AchievementEntry
-{
-    LocalizedString* Title;
-    LocalizedString* Description;
-    LocalizedString* Reward;
-    int32 Flags;
-    int16 InstanceID;                                               // -1 = none
-    int16 Supercedes;                                               // its Achievement parent (can`t start while parent uncomplete, use its Criteria if don`t have own, use its progress on begin)
-    int16 Category;
-    int16 UiOrder;
-    int16 SharesCriteria;                                           // referenced achievement (counting of all completed criterias)
-    int8 Faction;                                                   // -1 = all, 0 = horde, 1 = alliance
-    int8 Points;
-    int8 MinimumCriteria;                                           // need this count of completed criterias (own or referenced achievement criterias)
-    uint32 ID;
-    int32 IconFileID;
-    uint32 CriteriaTree;
-};
-
 struct AdventureJournalEntry
 {
     uint32 ID;
@@ -696,9 +677,6 @@ struct CriteriaEntry
         // CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS = 75
         // CRITERIA_TYPE_LEARN_SKILL_LINE       = 112
         uint32 SkillID;
-
-        // CRITERIA_TYPE_COMPLETE_ACHIEVEMENT   = 8
-        uint32 AchievementID;
 
         // CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE = 11
         uint32 ZoneID;
@@ -2081,7 +2059,7 @@ struct PlayerConditionEntry
     uint8 WeatherID;
     uint8 PartyStatus;
     uint8 LifetimeMaxPVPRank;
-    uint32 AchievementLogic;
+    //uint32 AchievementLogic;
     uint32 LfgLogic;
     uint32 AreaLogic;
     uint32 CurrencyLogic;
@@ -2122,7 +2100,7 @@ struct PlayerConditionEntry
     uint32 Time[2];
     int32 AuraSpellID[4];
     uint8 AuraStacks[4];
-    uint16 Achievement[4];
+    //uint16 Achievement[4];
     uint8 LfgStatus[4];
     uint8 LfgCompare[4];
     uint32 LfgValue[4];

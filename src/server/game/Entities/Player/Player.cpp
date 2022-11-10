@@ -19,7 +19,6 @@
 #include "Player.h"
 #include "AreaTrigger.h"
 #include "AccountMgr.h"
-#include "AchievementMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Bag.h"
@@ -90,12 +89,10 @@
 #include "PhasingHandler.h"
 #include "QueryHolder.h"
 #include "QuestDef.h"
-#include "QuestObjectiveCriteriaMgr.h"
 #include "QuestPackets.h"
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "RestMgr.h"
-#include "Scenario.h"
 #include "SkillDiscovery.h"
 #include "SocialMgr.h"
 #include "Spell.h"
@@ -340,9 +337,7 @@ Player::Player(WorldSession* session) : Unit(true), m_sceneMgr(this)
 
     _cinematicMgr = new CinematicMgr(this);
 
-    m_achievementMgr = new PlayerAchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
-    m_questObjectiveCriteriaMgr = Trinity::make_unique<QuestObjectiveCriteriaMgr>(this);
 
     for (uint8 i = 0; i < MAX_CUF_PROFILES; ++i)
         _CUFProfiles[i] = nullptr;
@@ -380,7 +375,6 @@ Player::~Player()
 
     delete m_declinedname;
     delete m_runes;
-    delete m_achievementMgr;
     delete m_reputationMgr;
     delete _cinematicMgr;
 
@@ -799,7 +793,6 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
             SendDurabilityLoss(this, 10);
         }
 
-        UpdateCriteria(CRITERIA_TYPE_DEATHS_FROM, 1, type);
     }
 
     return final_damage;
@@ -1129,8 +1122,6 @@ void Player::Update(uint32 p_time)
         }
     }
 
-    m_achievementMgr->UpdateTimedCriteria(p_time);
-
     if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING))
     {
         if (Unit* victim = GetVictim())
@@ -1384,13 +1375,6 @@ void Player::setDeathState(DeathState s)
         RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
 
         InitializeSelfResurrectionSpells();
-
-        UpdateCriteria(CRITERIA_TYPE_DEATH_AT_MAP, 1);
-        UpdateCriteria(CRITERIA_TYPE_DEATH, 1);
-        UpdateCriteria(CRITERIA_TYPE_DEATH_IN_DUNGEON, 1);
-        ResetCriteria(CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, CRITERIA_CONDITION_NO_DEATH);
-        ResetCriteria(CRITERIA_TYPE_HONORABLE_KILL, CRITERIA_CONDITION_NO_DEATH);
-        ResetCriteria(CRITERIA_TYPE_GET_KILLING_BLOWS, CRITERIA_CONDITION_NO_DEATH);
     }
 
     Unit::setDeathState(s);
@@ -2485,8 +2469,6 @@ void Player::GiveLevel(uint8 level)
         CharacterDatabase.CommitTransaction(trans);
     }
 
-    UpdateCriteria(CRITERIA_TYPE_REACH_LEVEL);
-
     // Refer-A-Friend
     if (GetSession()->GetRecruiterId())
     {
@@ -3149,18 +3131,6 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
             AddOverrideSpell(itr2->second.OverridesSpell, itr2->second.Spell);
     }
 
-    if (!GetSession()->PlayerLoading())
-    {
-        // not ranked skills
-        for (SkillLineAbilityMap::const_iterator _spell_idx = skill_bounds.first; _spell_idx != skill_bounds.second; ++_spell_idx)
-        {
-            UpdateCriteria(CRITERIA_TYPE_LEARN_SKILL_LINE, _spell_idx->second->SkillLine);
-            UpdateCriteria(CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS, _spell_idx->second->SkillLine);
-        }
-
-        UpdateCriteria(CRITERIA_TYPE_LEARN_SPELL, spellId);
-    }
-
     // needs to be when spell is already learned, to prevent infinite recursion crashes
     if (sDB2Manager.GetMount(spellId))
         GetSession()->GetCollectionMgr()->AddMount(spellId, MOUNT_STATUS_NONE, false, IsInWorld() ? false : true);
@@ -3171,7 +3141,6 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
         if (entry->SummonSpellID == int32(spellId) && GetSession()->GetBattlePetMgr()->GetPetCount(entry->ID) == 0)
         {
             GetSession()->GetBattlePetMgr()->AddPet(entry->ID, entry->CreatureID, BattlePetMgr::RollPetBreed(entry->ID), BattlePetMgr::GetDefaultPetQuality(entry->ID));
-            UpdateCriteria(CRITERIA_TYPE_OWN_BATTLE_PET_COUNT);
             break;
         }
     }
@@ -3546,8 +3515,6 @@ bool Player::ResetTalents(bool noCost)
     if (!noCost)
     {
         ModifyMoney(-(int64)cost);
-        UpdateCriteria(CRITERIA_TYPE_GOLD_SPENT_FOR_TALENTS, cost);
-        UpdateCriteria(CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS, 1);
 
         SetTalentResetCost(cost);
         SetTalentResetTime(time(nullptr));
@@ -4013,14 +3980,6 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             trans->Append(stmt);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME_BY_OWNER);
-            stmt->setUInt64(0, guid);
-            trans->Append(stmt);
-
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENTS);
-            stmt->setUInt64(0, guid);
-            trans->Append(stmt);
-
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_PROGRESS);
             stmt->setUInt64(0, guid);
             trans->Append(stmt);
 
@@ -5215,7 +5174,6 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
             itr->second.uState = SKILL_CHANGED;
 
         UpdateSkillEnchantments(skill_id, value, new_value);
-        UpdateCriteria(CRITERIA_TYPE_REACH_SKILL_LEVEL, skill_id);
         return true;
     }
 
@@ -5388,7 +5346,6 @@ bool Player::UpdateSkillPro(uint16 skillId, int32 chance, uint32 step)
     }
 
     UpdateSkillEnchantments(skillId, value, new_value);
-    UpdateCriteria(CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
     TC_LOG_DEBUG("entities.player.skills", "Player::UpdateSkillPro: Player '%s' (%s), SkillID: %u, Chance: %3.1f%% taken",
         GetName().c_str(), GetGUID().ToString().c_str(), skillId, chance / 10.0f);
     return true;
@@ -5515,9 +5472,6 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
             // if skill value is going up, update enchantments after setting the new value
             if (newVal > currVal)
                 UpdateSkillEnchantments(id, currVal, newVal);
-
-            UpdateCriteria(CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
-            UpdateCriteria(CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
         }
         else                                                //remove
         {
@@ -5582,8 +5536,6 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 SetUInt16Value(PLAYER_SKILL_LINEID + SKILL_MAX_RANK_OFFSET + field, offset, maxVal);
 
                 UpdateSkillEnchantments(id, currVal, newVal);
-                UpdateCriteria(CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
-                UpdateCriteria(CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
 
                 // insert new entry or update if not deleted old entry yet
                 if (itr != mSkillStatus.end())
@@ -5992,8 +5944,6 @@ void Player::CheckAreaExploreAndOutdoor()
     {
         SetUInt32Value(PLAYER_EXPLORED_ZONES_1 + offset, (uint32)(currFields | val));
 
-        UpdateCriteria(CRITERIA_TYPE_EXPLORE_AREA);
-
         if (areaEntry->ExplorationLevel > 0)
         {
             if (getLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
@@ -6359,11 +6309,6 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
             ApplyModUInt16Value(PLAYER_FIELD_KILLS, PLAYER_FIELD_KILLS_OFFSET_TODAY_KILLS, 1, true);
             // and those in a lifetime
             ApplyModUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, 1, true);
-            UpdateCriteria(CRITERIA_TYPE_EARN_HONORABLE_KILL);
-            UpdateCriteria(CRITERIA_TYPE_HK_CLASS, victim->getClass());
-            UpdateCriteria(CRITERIA_TYPE_HK_RACE, victim->getRace());
-            UpdateCriteria(CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
-            UpdateCriteria(CRITERIA_TYPE_HONORABLE_KILL, 1, 0, 0, victim);
         }
         else
         {
@@ -6508,8 +6453,6 @@ void Player::SetHonorLevel(uint8 level)
     SetUInt32Value(PLAYER_FIELD_HONOR_LEVEL, level);
     UpdateHonorNextLevel();
 
-    UpdateCriteria(CRITERIA_TYPE_HONOR_LEVEL_REACHED);
-
     // This code is here because no link was found between those items and this reward condition in the db2 files.
     // Interesting CriteriaTree found: Tree ids: 51140, 51156 (criteria id 31773, modifier tree id 37759)
     if (level == 50 && prestige == 1)
@@ -6529,8 +6472,6 @@ void Player::Prestige()
     SetUInt32Value(PLAYER_FIELD_PRESTIGE, GetPrestigeLevel() + 1);
     SetUInt32Value(PLAYER_FIELD_HONOR_LEVEL, 1);
     UpdateHonorNextLevel();
-
-    UpdateCriteria(CRITERIA_TYPE_PRESTIGE_REACHED);
 }
 
 bool Player::CanPrestige() const
@@ -6791,9 +6732,6 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         itr->second.Quantity = newTotalCount;
         itr->second.WeeklyQuantity = newWeekCount;
         itr->second.TrackedQuantity = newTrackedCount;
-
-        if (count > 0)
-            UpdateCriteria(CRITERIA_TYPE_CURRENCY, id, count);
 
         CurrencyChanged(id, count);
 
@@ -7224,8 +7162,6 @@ void Player::DuelComplete(DuelCompleteType type)
             }
             break;
         case DUEL_WON:
-            UpdateCriteria(CRITERIA_TYPE_LOSE_DUEL, 1);
-            duel->opponent->UpdateCriteria(CRITERIA_TYPE_WIN_DUEL, 1);
 
             // Credit for quest Death's Challenge
             if (getClass() == CLASS_DEATH_KNIGHT && duel->opponent->GetQuestStatus(12733) == QUEST_STATUS_INCOMPLETE)
@@ -11758,8 +11694,6 @@ Item* Player::StoreNewItem(ItemPosCountVec const& pos, uint32 itemId, bool updat
     if (item)
     {
         ItemAddedQuestCheck(itemId, count);
-        UpdateCriteria(CRITERIA_TYPE_RECEIVE_EPIC_ITEM, itemId, count);
-        UpdateCriteria(CRITERIA_TYPE_OWN_ITEM, itemId, 1);
 
         item->SetFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_NEW_ITEM);
 
@@ -11950,7 +11884,6 @@ Item* Player::EquipNewItem(uint16 pos, uint32 item, bool update)
     if (Item* pItem = Item::CreateItem(item, 1, this))
     {
         ItemAddedQuestCheck(item, 1);
-        UpdateCriteria(CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, 1);
         return EquipItem(pos, pItem, update);
     }
 
@@ -12060,10 +11993,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
     if (slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND)
         CheckTitanGripPenalty();
-
-    // only for full equip instead adding to stack
-    UpdateCriteria(CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
-    UpdateCriteria(CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
     return pItem;
 }
@@ -12185,9 +12114,6 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
 
         if (slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND)
             CheckTitanGripPenalty();
-
-        UpdateCriteria(CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
-        UpdateCriteria(CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
     }
 }
 
@@ -12348,7 +12274,6 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
 {
     // update quest counters
     ItemAddedQuestCheck(pItem->GetEntry(), pItem->GetCount());
-    UpdateCriteria(CRITERIA_TYPE_RECEIVE_EPIC_ITEM, pItem->GetEntry(), pItem->GetCount());
 
     // store item
     Item* pLastItem = StoreItem(dest, pItem, update);
@@ -14964,11 +14889,6 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
 {
     AddQuest(quest, questGiver);
 
-    for (QuestObjective const& obj : quest->GetObjectives())
-        if (obj.Type == QUEST_OBJECTIVE_CRITERIA_TREE)
-            if (m_questObjectiveCriteriaMgr->HasCompletedObjective(&obj))
-                KillCreditCriteriaTreeObjective(obj);
-
     if (CanCompleteQuest(quest->GetQuestId()))
         CompleteQuest(quest->GetQuestId());
 
@@ -15137,10 +15057,6 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
                 if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(obj.ObjectID))
                     GetReputationMgr().SetVisible(factionEntry);
                 break;
-            case QUEST_OBJECTIVE_CRITERIA_TREE:
-                if (quest->HasFlagEx(QUEST_FLAGS_EX_CLEAR_PROGRESS_OF_CRITERIA_TREE_OBJECTIVES_ON_ACCEPT))
-                    m_questObjectiveCriteriaMgr->ResetCriteriaTree(obj.ObjectID);
-                break;
             default:
                 break;
         }
@@ -15171,8 +15087,6 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     SetQuestSlot(log_slot, quest_id, qtime);
 
     m_QuestStatusSave[quest_id] = QUEST_DEFAULT_SAVE_TYPE;
-
-    StartCriteriaTimer(CRITERIA_TIMED_TYPE_QUEST, quest_id);
 
     SendQuestUpdate(quest_id);
 
@@ -15425,9 +15339,6 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     if (moneyRew)
     {
         ModifyMoney(moneyRew);
-
-        if (moneyRew > 0)
-            UpdateCriteria(CRITERIA_TYPE_MONEY_FROM_QUEST_REWARD, uint32(moneyRew));
     }
 
     // honor reward
@@ -15456,11 +15367,6 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     if (quest->IsDaily() || quest->IsDFQuest())
     {
         SetDailyQuestStatus(quest_id);
-        if (quest->IsDaily())
-        {
-            UpdateCriteria(CRITERIA_TYPE_COMPLETE_DAILY_QUEST, quest_id);
-            UpdateCriteria(CRITERIA_TYPE_COMPLETE_DAILY_QUEST_DAILY, quest_id);
-        }
     }
     else if (quest->IsWeekly())
         SetWeeklyQuestStatus(quest_id);
@@ -15515,11 +15421,6 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
             }
         }
     }
-
-    if (quest->GetZoneOrSort() > 0)
-        UpdateCriteria(CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE, quest->GetZoneOrSort());
-    UpdateCriteria(CRITERIA_TYPE_COMPLETE_QUEST_COUNT);
-    UpdateCriteria(CRITERIA_TYPE_COMPLETE_QUEST, quest->GetQuestId());
 
     if (uint32 questBit = sDB2Manager.GetQuestUniqueBitFlag(quest_id))
         SetQuestCompletedBit(questBit, true);
@@ -16627,9 +16528,6 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
             real_entry = killed->GetEntry();
     }
 
-    StartCriteriaTimer(CRITERIA_TIMED_TYPE_CREATURE, real_entry);   // MUST BE CALLED FIRST
-    UpdateCriteria(CRITERIA_TYPE_KILL_CREATURE, real_entry, addKillCount, 0, killed);
-
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
         uint32 questid = GetQuestSlotQuestId(i);
@@ -17663,10 +17561,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     SetObjectScale(1.0f);
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
 
-    // load achievements before anything else to prevent multiple gains for the same achievement/criteria on every loading (as loading does call UpdateCriteria)
-    m_achievementMgr->LoadFromDB(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS));
-    m_questObjectiveCriteriaMgr->LoadFromDB(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS_OBJECTIVES_CRITERIA), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS_OBJECTIVES_CRITERIA_PROGRESS));
-
     uint64 money = fields[8].GetUInt64();
     if (money > MAX_MONEY_AMOUNT)
         money = MAX_MONEY_AMOUNT;
@@ -18348,8 +18242,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
         _restMgr->AddRestBonus(REST_TYPE_XP, time_diff * _restMgr->CalcExtraPerSec(REST_TYPE_XP, bubble));
     }
 
-    m_achievementMgr->CheckAllAchievementCriteria(this);
-    m_questObjectiveCriteriaMgr->CheckAllQuestObjectiveCriteria(this);
     return true;
 }
 
@@ -19763,25 +19655,20 @@ bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report
         else if (GetTeam() == HORDE && ar->quest_H && !GetQuestRewardStatus(ar->quest_H))
             missingQuest = ar->quest_H;
 
-        uint32 missingAchievement = 0;
         Player* leader = this;
         ObjectGuid leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
         if (leaderGuid != GetGUID())
             leader = ObjectAccessor::FindPlayer(leaderGuid);
 
-        if (ar->achievement)
-            if (!leader || !leader->HasAchieved(ar->achievement))
-                missingAchievement = ar->achievement;
-
         Difficulty target_difficulty = GetDifficultyID(mapEntry);
         MapDifficultyEntry const* mapDiff = sDB2Manager.GetDownscaledMapDifficultyData(target_map, target_difficulty);
-        if (LevelMin || LevelMax || missingItem || missingQuest || missingAchievement)
+        if (LevelMin || LevelMax || missingItem || missingQuest )
         {
             if (report)
             {
                 if (missingQuest && !ar->questFailedText.empty())
                     ChatHandler(GetSession()).PSendSysMessage("%s", ar->questFailedText.c_str());
-                else if (mapDiff->Message->Str[sWorld->GetDefaultDbcLocale()][0] != '\0') // if (missingAchievement) covered by this case
+                else if (mapDiff->Message->Str[sWorld->GetDefaultDbcLocale()][0] != '\0')
                     SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
                 else if (missingItem)
                     GetSession()->SendNotification(GetSession()->GetTrinityString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, ASSERT_NOTNULL(sObjectMgr->GetItemTemplate(missingItem))->GetName(GetSession()->GetSessionDbcLocale()));
@@ -20280,9 +20167,7 @@ void Player::SaveToDB(bool create /*=false*/)
     _SaveActions(trans);
     _SaveAuras(trans);
     _SaveSkills(trans);
-    m_achievementMgr->SaveToDB(trans);
     m_reputationMgr->SaveToDB(trans);
-    m_questObjectiveCriteriaMgr->SaveToDB(trans);
     _SaveEquipmentSets(trans);
     GetSession()->SaveTutorialsData(trans);                 // changed only while character in game
     _SaveInstanceTimeRestrictions(trans);
@@ -22239,9 +22124,6 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
     }
 
-    //Checks and preparations done, DO FLIGHT
-    UpdateCriteria(CRITERIA_TYPE_FLIGHT_PATHS_TAKEN, 1);
-
     // prevent stealth flight
     //RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
 
@@ -22251,14 +22133,12 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         ASSERT(lastPathNode);
         m_taxi.ClearTaxiDestinations();
         ModifyMoney(-int64(totalcost));
-        UpdateCriteria(CRITERIA_TYPE_GOLD_SPENT_FOR_TRAVELLING, totalcost);
         TeleportTo(lastPathNode->ContinentID, lastPathNode->Pos.X, lastPathNode->Pos.Y, lastPathNode->Pos.Z, GetOrientation());
         return false;
     }
     else
     {
         ModifyMoney(-int64(firstcost));
-        UpdateCriteria(CRITERIA_TYPE_GOLD_SPENT_FOR_TRAVELLING, firstcost);
         GetSession()->SendActivateTaxiReply(ERR_TAXIOK);
         GetSession()->SendDoFlight(mount_display_id, sourcepath);
     }
@@ -22560,24 +22440,6 @@ bool Player::BuyCurrencyFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorSlot,
             SendEquipError(EQUIP_ERR_CANT_EQUIP_RANK, nullptr, nullptr);
             return false;
         }
-
-        if (iece->MinFactionID && uint32(GetReputationRank(iece->MinFactionID)) < iece->RequiredAchievement)
-        {
-            SendBuyError(BUY_ERR_REPUTATION_REQUIRE, creature, currency, 0);
-            return false;
-        }
-
-        if (iece->Flags & ITEM_EXT_COST_FLAG_REQUIRE_GUILD && !GetGuildId())
-        {
-            SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, nullptr, nullptr); // Find correct error
-            return false;
-        }
-
-        if (iece->RequiredAchievement && !HasAchieved(iece->RequiredAchievement))
-        {
-            SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, nullptr, nullptr); // Find correct error
-            return false;
-        }
     }
     else // currencies have no price defined, can only be bought with ExtendedCost
     {
@@ -22768,12 +22630,6 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         }
 
         if (iece->Flags & ITEM_EXT_COST_FLAG_REQUIRE_GUILD && !GetGuildId())
-        {
-            SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, nullptr, nullptr); // Find correct error
-            return false;
-        }
-
-        if (iece->RequiredAchievement && !HasAchieved(iece->RequiredAchievement))
         {
             SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, nullptr, nullptr); // Find correct error
             return false;
@@ -23570,7 +23426,6 @@ void Player::SetMoney(uint64 value)
 {
     SetUInt64Value(PLAYER_FIELD_COINAGE, value);
     MoneyChanged(value);
-    UpdateCriteria(CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED);
 }
 
 bool Player::IsQuestRewarded(uint32 quest_id) const
@@ -23712,9 +23567,6 @@ void Player::SendInitialPacketsBeforeAddToMap()
     SendCurrencies();
     /// SMSG_EQUIPMENT_SET_LIST
     SendEquipmentSetList();
-
-    m_achievementMgr->SendAllData(this);
-    m_questObjectiveCriteriaMgr->SendAllData(this);
 
     /// SMSG_LOGIN_SETTIMESPEED
     static float const TimeSpeed = 0.01666667f;
@@ -24641,8 +24493,6 @@ void Player::SummonIfPossible(bool agree)
         bg->EventPlayerDroppedFlag(this);
 
     m_summon_expire = 0;
-
-    UpdateCriteria(CRITERIA_TYPE_ACCEPTED_SUMMONINGS, 1);
 
     TeleportTo(m_summon_location);
 }
@@ -25779,9 +25629,6 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot, AELootResult* aeResult/* 
         if (!aeResult)
         {
             SendNewItem(newitem, uint32(item->count), false, false, true);
-            UpdateCriteria(CRITERIA_TYPE_LOOT_ITEM, item->itemid, item->count);
-            UpdateCriteria(CRITERIA_TYPE_LOOT_TYPE, item->itemid, item->count, loot->loot_type);
-            UpdateCriteria(CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemid, item->count);
         }
         else
             aeResult->Add(newitem, item->count, loot->loot_type);
@@ -26026,10 +25873,6 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
                 uint32 original_health = GetHealth();
                 uint32 final_damage = EnvironmentalDamage(DAMAGE_FALL, damage);
-
-                // recheck alive, might have died of EnvironmentalDamage, avoid cases when player die in fact like Spirit of Redemption case
-                if (IsAlive() && final_damage < original_health)
-                    UpdateCriteria(CRITERIA_TYPE_FALL_WITHOUT_DYING, uint32(z_diff*100));
             }
 
             //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
@@ -26037,69 +25880,6 @@ void Player::HandleFall(MovementInfo const& movementInfo)
         }
     }
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // No fly zone - Parachute
-}
-
-void Player::ResetAchievements()
-{
-    m_achievementMgr->Reset();
-}
-
-void Player::SendRespondInspectAchievements(Player* player) const
-{
-    m_achievementMgr->SendAchievementInfo(player);
-}
-
-uint32 Player::GetAchievementPoints() const
-{
-    return m_achievementMgr->GetAchievementPoints();
-}
-
-bool Player::HasAchieved(uint32 achievementId) const
-{
-    return m_achievementMgr->HasAchieved(achievementId);
-}
-
-void Player::StartCriteriaTimer(CriteriaTimedTypes type, uint32 entry, uint32 timeLost/* = 0*/)
-{
-    m_achievementMgr->StartCriteriaTimer(type, entry, timeLost);
-}
-
-void Player::RemoveCriteriaTimer(CriteriaTimedTypes type, uint32 entry)
-{
-    m_achievementMgr->RemoveCriteriaTimer(type, entry);
-}
-
-void Player::ResetCriteria(CriteriaTypes type, uint64 miscValue1 /*= 0*/, uint64 miscValue2 /*= 0*/, bool evenIfCriteriaComplete /* = false*/)
-{
-    m_achievementMgr->ResetCriteria(type, miscValue1, miscValue2, evenIfCriteriaComplete);
-    m_questObjectiveCriteriaMgr->ResetCriteria(type, miscValue1, miscValue2, evenIfCriteriaComplete);
-}
-
-void Player::UpdateCriteria(CriteriaTypes type, uint64 miscValue1 /*= 0*/, uint64 miscValue2 /*= 0*/, uint64 miscValue3 /*= 0*/, Unit* unit /*= NULL*/)
-{
-    m_achievementMgr->UpdateCriteria(type, miscValue1, miscValue2, miscValue3, unit, this);
-    m_questObjectiveCriteriaMgr->UpdateCriteria(type, miscValue1, miscValue2, miscValue3, unit, this);
-
-    // Update only individual achievement criteria here, otherwise we may get multiple updates
-    // from a single boss kill
-    if (CriteriaMgr::IsGroupCriteriaType(type))
-        return;
-
-    if (Scenario* scenario = GetScenario())
-        scenario->UpdateCriteria(type, miscValue1, miscValue2, miscValue3, unit, this);
-
-    if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
-        guild->UpdateCriteria(type, miscValue1, miscValue2, miscValue3, unit, this);
-}
-
-void Player::CompletedAchievement(AchievementEntry const* entry)
-{
-    m_achievementMgr->CompletedAchievement(entry, this);
-}
-
-bool Player::ModifierTreeSatisfied(uint32 modifierTreeId) const
-{
-    return m_achievementMgr->ModifierTreeSatisfied(modifierTreeId);
 }
 
 TalentLearnResult Player::LearnTalent(uint32 talentId, int32* spellOnCooldown)

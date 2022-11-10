@@ -22,7 +22,6 @@
 
 #include "World.h"
 #include "AccountMgr.h"
-#include "AchievementMgr.h"
 #include "AreaTriggerDataStore.h"
 #include "ArenaTeamMgr.h"
 #include "AuctionHouseBot.h"
@@ -73,7 +72,6 @@
 #include "PlayerDump.h"
 #include "PoolMgr.h"
 #include "Realm.h"
-#include "ScenarioMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptReloadMgr.h"
 #include "SkillDiscovery.h"
@@ -1905,21 +1903,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading skill tier info...");
     sObjectMgr->LoadSkillTiers();
 
-    TC_LOG_INFO("server.loading", "Loading Criteria Modifier trees...");
-    sCriteriaMgr->LoadCriteriaModifiersTree();
-    TC_LOG_INFO("server.loading", "Loading Criteria Lists...");
-    sCriteriaMgr->LoadCriteriaList();
-    TC_LOG_INFO("server.loading", "Loading Criteria Data...");
-    sCriteriaMgr->LoadCriteriaData();
-    TC_LOG_INFO("server.loading", "Loading Achievements...");
-    sAchievementMgr->LoadAchievementReferenceList();
-    TC_LOG_INFO("server.loading", "Loading Achievement Rewards...");
-    sAchievementMgr->LoadRewards();
-    TC_LOG_INFO("server.loading", "Loading Achievement Reward Locales...");
-    sAchievementMgr->LoadRewardLocales();
-    TC_LOG_INFO("server.loading", "Loading Completed Achievements...");
-    sAchievementMgr->LoadCompletedAchievements();
-
     ///- Load dynamic data tables from the database
     TC_LOG_INFO("server.loading", "Loading Item Auctions...");
     sAuctionMgr->LoadAuctionItems();
@@ -1935,9 +1918,6 @@ void World::SetInitialWorldSettings()
         TC_LOG_INFO("server.loading", "Loading Black Market Auctions...");
         sBlackMarketMgr->LoadAuctions();
     }
-
-    TC_LOG_INFO("server.loading", "Loading Guild rewards...");
-    sGuildMgr->LoadGuildRewards();
 
     TC_LOG_INFO("server.loading", "Loading Guilds...");
     sGuildMgr->LoadGuilds();
@@ -1993,9 +1973,6 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading Conditions...");
     sConditionMgr->LoadConditions();
-
-    TC_LOG_INFO("server.loading", "Loading faction change achievement pairs...");
-    sObjectMgr->LoadFactionChangeAchievements();
 
     TC_LOG_INFO("server.loading", "Loading faction change spell pairs...");
     sObjectMgr->LoadFactionChangeSpells();
@@ -2192,13 +2169,6 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading battle pets info...");
     BattlePetMgr::Initialize();
-
-    TC_LOG_INFO("server.loading", "Loading scenarios");
-    sScenarioMgr->LoadDB2Data();
-    sScenarioMgr->LoadDBData();
-
-    TC_LOG_INFO("server.loading", "Loading scenario poi data");
-    sScenarioMgr->LoadScenarioPOI();
 
     // Preload all cells, if required for the base maps
     if (sWorld->getBoolConfig(CONFIG_BASEMAP_LOAD_GRIDS))

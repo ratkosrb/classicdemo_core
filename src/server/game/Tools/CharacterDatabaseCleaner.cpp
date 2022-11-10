@@ -17,7 +17,6 @@
  */
 
 #include "Common.h"
-#include "CriteriaHandler.h"
 #include "CharacterDatabaseCleaner.h"
 #include "DB2Stores.h"
 #include "Log.h"
@@ -45,9 +44,6 @@ void CharacterDatabaseCleaner::CleanDatabase()
     uint32 flags = (*result)[0].GetUInt32();
 
     // clean up
-    if (flags & CLEANING_FLAG_ACHIEVEMENT_PROGRESS)
-        CleanCharacterAchievementProgress();
-
     if (flags & CLEANING_FLAG_SKILLS)
         CleanCharacterSkills();
 
@@ -107,16 +103,6 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
         ss << ')';
         CharacterDatabase.Execute(ss.str().c_str());
     }
-}
-
-bool CharacterDatabaseCleaner::AchievementProgressCheck(uint32 criteria)
-{
-    return sCriteriaMgr->GetCriteria(criteria) != nullptr;
-}
-
-void CharacterDatabaseCleaner::CleanCharacterAchievementProgress()
-{
-    CheckUnique("criteria", "character_achievement_progress", &AchievementProgressCheck);
 }
 
 bool CharacterDatabaseCleaner::SkillCheck(uint32 skill)

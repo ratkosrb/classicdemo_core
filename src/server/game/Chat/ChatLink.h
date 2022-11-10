@@ -30,7 +30,6 @@ struct ItemTemplate;
 struct ItemRandomSuffixEntry;
 struct ItemRandomPropertiesEntry;
 class SpellInfo;
-struct AchievementEntry;
 struct GlyphPropertiesEntry;
 class Quest;
 
@@ -109,23 +108,6 @@ public:
 
 protected:
     SpellInfo const* _spell;
-};
-
-// AchievementChatLink - link to quest
-class TC_GAME_API AchievementChatLink : public ChatLink
-{
-public:
-    AchievementChatLink() : ChatLink(), _guid(0), _achievement(NULL)
-    {
-        memset(_data, 0, sizeof(_data));
-    }
-    virtual bool Initialize(std::istringstream& iss) override;
-    virtual bool ValidateName(char* buffer, const char* context) override;
-
-protected:
-    uint32 _guid;
-    AchievementEntry const* _achievement;
-    uint32 _data[8];
 };
 
 // TradeChatLink - link to trade info

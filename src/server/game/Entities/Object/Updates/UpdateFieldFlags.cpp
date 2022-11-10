@@ -394,6 +394,7 @@ uint32 UnitUpdateFieldFlags[PLAYER_END] =
     UF_FLAG_PRIVATE | UF_FLAG_OWNER,                        // UNIT_FIELD_STAT+1
     UF_FLAG_PRIVATE | UF_FLAG_OWNER,                        // UNIT_FIELD_STAT+2
     UF_FLAG_PRIVATE | UF_FLAG_OWNER,                        // UNIT_FIELD_STAT+3
+    UF_FLAG_OWNER,                                          // UNIT_FIELD_TRAINING_POINTS_TOTAL
     UF_FLAG_PRIVATE | UF_FLAG_OWNER,                        // UNIT_FIELD_POSSTAT
     UF_FLAG_PRIVATE | UF_FLAG_OWNER,                        // UNIT_FIELD_POSSTAT+1
     UF_FLAG_PRIVATE | UF_FLAG_OWNER,                        // UNIT_FIELD_POSSTAT+2
@@ -2132,6 +2133,12 @@ uint32 UnitUpdateFieldFlags[PLAYER_END] =
     UF_FLAG_PRIVATE,                                        // PLAYER_FARSIGHT+1
     UF_FLAG_PRIVATE,                                        // PLAYER_FARSIGHT+2
     UF_FLAG_PRIVATE,                                        // PLAYER_FARSIGHT+3
+    //new 1.13
+    UF_FLAG_PUBLIC,                                         // PLAYER_FIELD_COMBO_TARGET
+    UF_FLAG_PUBLIC,                                         // PLAYER_FIELD_COMBO_TARGET+1
+    UF_FLAG_PUBLIC,                                         // PLAYER_FIELD_COMBO_TARGET+2
+    UF_FLAG_PUBLIC,                                         // PLAYER_FIELD_COMBO_TARGET+3
+    //
     UF_FLAG_PRIVATE,                                        // PLAYER_FIELD_SUMMONED_BATTLE_PET_ID
     UF_FLAG_PRIVATE,                                        // PLAYER_FIELD_SUMMONED_BATTLE_PET_ID+1
     UF_FLAG_PRIVATE,                                        // PLAYER_FIELD_SUMMONED_BATTLE_PET_ID+2
@@ -2619,7 +2626,8 @@ uint32 UnitUpdateFieldFlags[PLAYER_END] =
     UF_FLAG_PRIVATE,                                        // PLAYER_OFFHAND_CRIT_PERCENTAGE
     UF_FLAG_PRIVATE,                                        // PLAYER_SPELL_CRIT_PERCENTAGE1
     UF_FLAG_PRIVATE,                                        // PLAYER_SHIELD_BLOCK
-    UF_FLAG_PRIVATE,                                        // PLAYER_SHIELD_BLOCK_CRIT_PERCENTAGE
+    //not exist in 1.13.0
+    //UF_FLAG_PRIVATE,                                      // PLAYER_SHIELD_BLOCK_CRIT_PERCENTAGE
     UF_FLAG_PRIVATE,                                        // PLAYER_MASTERY
     UF_FLAG_PRIVATE,                                        // PLAYER_SPEED
     UF_FLAG_PRIVATE,                                        // PLAYER_LIFESTEAL

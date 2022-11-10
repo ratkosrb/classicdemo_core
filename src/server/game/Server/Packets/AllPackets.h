@@ -18,7 +18,6 @@
 #ifndef AllPackets_h__
 #define AllPackets_h__
 
-#include "AchievementPackets.h"
 #include "AdventureJournalPackets.h"
 #include "AreaTriggerPackets.h"
 #include "ArtifactPackets.h"
@@ -64,7 +63,6 @@
 #include "QuestPackets.h"
 #include "ReferAFriendPackets.h"
 #include "ReputationPackets.h"
-#include "ScenarioPackets.h"
 #include "ScenePackets.h"
 #include "SocialPackets.h"
 #include "SpellPackets.h"

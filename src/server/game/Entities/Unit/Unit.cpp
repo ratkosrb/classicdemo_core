@@ -838,114 +838,104 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             if (Battleground* bg = killer->GetBattleground())
                 bg->UpdatePlayerScore(killer, SCORE_DAMAGE_DONE, damage);
 
-        killer->UpdateCriteria(CRITERIA_TYPE_DAMAGE_DONE, health > damage ? damage : health, 0, 0, victim);
-        killer->UpdateCriteria(CRITERIA_TYPE_HIGHEST_HIT_DEALT, damage);
-    }
-
-    if (victim->GetTypeId() == TYPEID_PLAYER)
-        victim->ToPlayer()->UpdateCriteria(CRITERIA_TYPE_HIGHEST_HIT_RECEIVED, damage);
-    else if (!victim->IsControlledByPlayer() || victim->IsVehicle())
-    {
-        if (!victim->ToCreature()->hasLootRecipient())
-            victim->ToCreature()->SetLootRecipient(this);
-
-        if (IsControlledByPlayer())
-            victim->ToCreature()->LowerPlayerDamageReq(health < damage ?  health : damage);
-    }
-
-    damage /= victim->GetHealthMultiplierForTarget(this);
-
-    if (health <= damage)
-    {
-        TC_LOG_DEBUG("entities.unit", "DealDamage: victim just died");
-
-        if (victim->GetTypeId() == TYPEID_PLAYER && victim != this)
-            victim->ToPlayer()->UpdateCriteria(CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health);
-
-        Kill(victim, durabilityLoss);
-    }
-    else
-    {
-        TC_LOG_DEBUG("entities.unit", "DealDamageAlive");
-
-        if (victim->GetTypeId() == TYPEID_PLAYER)
-            victim->ToPlayer()->UpdateCriteria(CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, damage);
-
-        victim->ModifyHealth(-(int32)damage);
-
-        if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
-        {
-            victim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DIRECT_DAMAGE, spellProto ? spellProto->Id : 0);
-            victim->UpdateLastDamagedTime(spellProto);
-        }
-
-        if (victim->GetTypeId() != TYPEID_PLAYER)
-            victim->AddThreat(this, float(damage), damageSchoolMask, spellProto);
-        else                                                // victim is a player
-        {
-            // random durability for items (HIT TAKEN)
-            if (roll_chance_f(sWorld->getRate(RATE_DURABILITY_LOSS_DAMAGE)))
+            else if (!victim->IsControlledByPlayer() || victim->IsVehicle())
             {
-                EquipmentSlots slot = EquipmentSlots(urand(0, EQUIPMENT_SLOT_END-1));
-                victim->ToPlayer()->DurabilityPointLossForEquipSlot(slot);
+                if (!victim->ToCreature()->hasLootRecipient())
+                    victim->ToCreature()->SetLootRecipient(this);
+
+                if (IsControlledByPlayer())
+                    victim->ToCreature()->LowerPlayerDamageReq(health < damage ? health : damage);
+            }
+
+        damage /= victim->GetHealthMultiplierForTarget(this);
+
+        if (health <= damage)
+        {
+            TC_LOG_DEBUG("entities.unit", "DealDamage: victim just died");
+
+
+            Kill(victim, durabilityLoss);
+        }
+        else
+        {
+            TC_LOG_DEBUG("entities.unit", "DealDamageAlive");
+
+            victim->ModifyHealth(-(int32)damage);
+
+            if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
+            {
+                victim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DIRECT_DAMAGE, spellProto ? spellProto->Id : 0);
+                victim->UpdateLastDamagedTime(spellProto);
+            }
+
+            if (victim->GetTypeId() != TYPEID_PLAYER)
+                victim->AddThreat(this, float(damage), damageSchoolMask, spellProto);
+            else                                                // victim is a player
+            {
+                // random durability for items (HIT TAKEN)
+                if (roll_chance_f(sWorld->getRate(RATE_DURABILITY_LOSS_DAMAGE)))
+                {
+                    EquipmentSlots slot = EquipmentSlots(urand(0, EQUIPMENT_SLOT_END - 1));
+                    victim->ToPlayer()->DurabilityPointLossForEquipSlot(slot);
+                }
+            }
+
+            if (GetTypeId() == TYPEID_PLAYER)
+            {
+                // random durability for items (HIT DONE)
+                if (roll_chance_f(sWorld->getRate(RATE_DURABILITY_LOSS_DAMAGE)))
+                {
+                    EquipmentSlots slot = EquipmentSlots(urand(0, EQUIPMENT_SLOT_END - 1));
+                    ToPlayer()->DurabilityPointLossForEquipSlot(slot);
+                }
+            }
+
+            if (damagetype != NODAMAGE && damage)
+            {
+                if (victim != this && victim->GetTypeId() == TYPEID_PLAYER && // does not support creature push_back
+                    (!spellProto || !spellProto->HasAttribute(SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE)))
+                {
+                    if (damagetype != DOT)
+                        if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
+                            if (spell->getState() == SPELL_STATE_PREPARING)
+                            {
+                                uint32 interruptFlags = spell->m_spellInfo->InterruptFlags;
+                                if (interruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
+                                    victim->InterruptNonMeleeSpells(false);
+                                else if (interruptFlags & SPELL_INTERRUPT_FLAG_PUSH_BACK)
+                                    spell->Delayed();
+                            }
+
+                    if (Spell* spell = victim->m_currentSpells[CURRENT_CHANNELED_SPELL])
+                        if (spell->getState() == SPELL_STATE_CASTING && spell->m_spellInfo->HasChannelInterruptFlag(CHANNEL_FLAG_DELAY) && damagetype != DOT)
+                            spell->DelayedChannel();
+                }
+            }
+
+            // last damage from duel opponent
+            if (duel_hasEnded)
+            {
+                Player* he = duel_wasMounted ? victim->GetCharmer()->ToPlayer() : victim->ToPlayer();
+
+                ASSERT(he && he->duel);
+
+                if (duel_wasMounted) // In this case victim==mount
+                    victim->SetHealth(1);
+                else
+                    he->SetHealth(1);
+
+                he->duel->opponent->CombatStopWithPets(true);
+                he->CombatStopWithPets(true);
+
+                he->CastSpell(he, 7267, true);                  // beg
+                he->DuelComplete(DUEL_WON);
             }
         }
 
-        if (GetTypeId() == TYPEID_PLAYER)
-        {
-            // random durability for items (HIT DONE)
-            if (roll_chance_f(sWorld->getRate(RATE_DURABILITY_LOSS_DAMAGE)))
-            {
-                EquipmentSlots slot = EquipmentSlots(urand(0, EQUIPMENT_SLOT_END-1));
-                ToPlayer()->DurabilityPointLossForEquipSlot(slot);
-            }
-        }
+        TC_LOG_DEBUG("entities.unit", "DealDamageEnd returned %d damage", damage);
 
-        if (damagetype != NODAMAGE && damage)
-        {
-            if (victim != this && victim->GetTypeId() == TYPEID_PLAYER && // does not support creature push_back
-                (!spellProto || !spellProto->HasAttribute(SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE)))
-            {
-                if (damagetype != DOT)
-                    if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
-                        if (spell->getState() == SPELL_STATE_PREPARING)
-                        {
-                            uint32 interruptFlags = spell->m_spellInfo->InterruptFlags;
-                            if (interruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
-                                victim->InterruptNonMeleeSpells(false);
-                            else if (interruptFlags & SPELL_INTERRUPT_FLAG_PUSH_BACK)
-                                spell->Delayed();
-                        }
-
-                if (Spell* spell = victim->m_currentSpells[CURRENT_CHANNELED_SPELL])
-                    if (spell->getState() == SPELL_STATE_CASTING && spell->m_spellInfo->HasChannelInterruptFlag(CHANNEL_FLAG_DELAY) && damagetype != DOT)
-                        spell->DelayedChannel();
-            }
-        }
-
-        // last damage from duel opponent
-        if (duel_hasEnded)
-        {
-            Player* he = duel_wasMounted ? victim->GetCharmer()->ToPlayer() : victim->ToPlayer();
-
-            ASSERT(he && he->duel);
-
-            if (duel_wasMounted) // In this case victim==mount
-                victim->SetHealth(1);
-            else
-                he->SetHealth(1);
-
-            he->duel->opponent->CombatStopWithPets(true);
-            he->CombatStopWithPets(true);
-
-            he->CastSpell(he, 7267, true);                  // beg
-            he->DuelComplete(DUEL_WON);
-        }
+        return damage;
     }
-
-    TC_LOG_DEBUG("entities.unit", "DealDamageEnd returned %d damage", damage);
-
-    return damage;
 }
 
 void Unit::CastStop(uint32 except_spellid)
@@ -6115,18 +6105,6 @@ void Unit::DealHeal(HealInfo& healInfo)
     {
         if (Battleground* bg = player->GetBattleground())
             bg->UpdatePlayerScore(player, SCORE_HEALING_DONE, gain);
-
-        // use the actual gain, as the overheal shall not be counted, skip gain 0 (it ignored anyway in to criteria)
-        if (gain)
-            player->UpdateCriteria(CRITERIA_TYPE_HEALING_DONE, gain, 0, 0, victim);
-
-        player->UpdateCriteria(CRITERIA_TYPE_HIGHEST_HEAL_CAST, addhealth);
-    }
-
-    if (Player* player = victim->ToPlayer())
-    {
-        player->UpdateCriteria(CRITERIA_TYPE_TOTAL_HEALING_RECEIVED, gain);
-        player->UpdateCriteria(CRITERIA_TYPE_HIGHEST_HEALING_RECEIVED, addhealth);
     }
 
     if (gain)
@@ -11000,11 +10978,6 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
     // Proc auras on death - must be before aura/combat remove
     victim->ProcSkillsAndAuras(victim, PROC_FLAG_NONE, PROC_FLAG_DEATH, PROC_SPELL_TYPE_MASK_ALL, PROC_SPELL_PHASE_NONE, PROC_HIT_NONE, nullptr, nullptr, nullptr);
 
-    // update get killing blow achievements, must be done before setDeathState to be able to require auras on target
-    // and before Spirit of Redemption as it also removes auras
-    if (Player* killerPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
-        killerPlayer->UpdateCriteria(CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, 0, victim);
-
     TC_LOG_DEBUG("entities.unit", "SET JUST_DIED");
     victim->setDeathState(JUST_DIED);
 
@@ -11129,15 +11102,6 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
             else
                 bg->HandleKillUnit(victim->ToCreature(), player);
         }
-    }
-
-    // achievement stuff
-    if (victim->GetTypeId() == TYPEID_PLAYER)
-    {
-        if (GetTypeId() == TYPEID_UNIT)
-            victim->ToPlayer()->UpdateCriteria(CRITERIA_TYPE_KILLED_BY_CREATURE, GetEntry());
-        else if (GetTypeId() == TYPEID_PLAYER && victim != this)
-            victim->ToPlayer()->UpdateCriteria(CRITERIA_TYPE_KILLED_BY_PLAYER, 1, ToPlayer()->GetTeam());
     }
 
     // Hook for OnPVPKill Event

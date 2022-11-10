@@ -43,8 +43,6 @@ public:
     Guild* GetGuildByName(std::string const& guildName) const;
     std::string GetGuildNameById(ObjectGuid::LowType guildId) const;
 
-    void LoadGuildRewards();
-
     void LoadGuilds();
     void AddGuild(Guild* guild);
     void RemoveGuild(ObjectGuid::LowType guildId);
