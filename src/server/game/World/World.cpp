@@ -27,7 +27,6 @@
 #include "AuctionHouseBot.h"
 #include "AuctionHouseMgr.h"
 #include "AuthenticationPackets.h"
-#include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "BattlenetRpcErrorCodes.h"
 #include "BattlePetMgr.h"
@@ -48,7 +47,6 @@
 #include "GameEventMgr.h"
 #include "GameObjectModel.h"
 #include "GameTables.h"
-#include "GarrisonMgr.h"
 #include "GitRevision.h"
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
@@ -2004,9 +2002,6 @@ void World::SetInitialWorldSettings()
     /*TC_LOG_INFO("server.loading", "Loading GM surveys...");
     sSupportMgr->LoadSurveys();*/
 
-    TC_LOG_INFO("server.loading", "Loading garrison info...");
-    sGarrisonMgr.Initialize();
-
     ///- Handle outdated emails (delete/return)
     TC_LOG_INFO("server.loading", "Returning old mails...");
     sObjectMgr->ReturnOrDeleteOldMails(false);
@@ -2120,10 +2115,6 @@ void World::SetInitialWorldSettings()
     ///- Initialize outdoor pvp
     TC_LOG_INFO("server.loading", "Starting Outdoor PvP System");
     sOutdoorPvPMgr->InitOutdoorPvP();
-
-    ///- Initialize Battlefield
-    TC_LOG_INFO("server.loading", "Starting Battlefield System (TEMP DISABLED)");
-    //sBattlefieldMgr->InitBattlefield();
 
     TC_LOG_INFO("server.loading", "Loading Transports...");
     sTransportMgr->SpawnContinentTransports();
@@ -2415,9 +2406,6 @@ void World::Update(uint32 diff)
 
     sOutdoorPvPMgr->Update(diff);
     RecordTimeDiff("UpdateOutdoorPvPMgr");
-
-    sBattlefieldMgr->Update(diff);
-    RecordTimeDiff("BattlefieldMgr");
 
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())

@@ -332,62 +332,6 @@ void HotfixDatabaseConnection::DoPrepareStatements()
         " FROM gameobjects ORDER BY ID DESC", CONNECTION_SYNCH);
     PREPARE_LOCALE_STMT(HOTFIX_SEL_GAMEOBJECTS, "SELECT ID, Name_lang FROM gameobjects_locale WHERE locale = ?", CONNECTION_SYNCH);
 
-    // GarrAbility.db2
-    PrepareStatement(HOTFIX_SEL_GARR_ABILITY, "SELECT Name, Description, IconFileDataID, Flags, FactionChangeGarrAbilityID, GarrAbilityCategoryID, "
-        "GarrFollowerTypeID, ID FROM garr_ability ORDER BY ID DESC", CONNECTION_SYNCH);
-    PREPARE_LOCALE_STMT(HOTFIX_SEL_GARR_ABILITY, "SELECT ID, Name_lang, Description_lang FROM garr_ability_locale WHERE locale = ?", CONNECTION_SYNCH);
-
-    // GarrBuilding.db2
-    PrepareStatement(HOTFIX_SEL_GARR_BUILDING, "SELECT ID, AllianceName, HordeName, Description, Tooltip, HordeGameObjectID, AllianceGameObjectID, "
-        "IconFileDataID, CurrencyTypeID, HordeUiTextureKitID, AllianceUiTextureKitID, AllianceSceneScriptPackageID, HordeSceneScriptPackageID, "
-        "GarrAbilityID, BonusGarrAbilityID, GoldCost, GarrSiteID, BuildingType, UpgradeLevel, Flags, ShipmentCapacity, GarrTypeID, BuildSeconds, "
-        "CurrencyQty, MaxAssignments FROM garr_building ORDER BY ID DESC", CONNECTION_SYNCH);
-    PREPARE_LOCALE_STMT(HOTFIX_SEL_GARR_BUILDING, "SELECT ID, AllianceName_lang, HordeName_lang, Description_lang, Tooltip_lang"
-        " FROM garr_building_locale WHERE locale = ?", CONNECTION_SYNCH);
-
-    // GarrBuildingPlotInst.db2
-    PrepareStatement(HOTFIX_SEL_GARR_BUILDING_PLOT_INST, "SELECT MapOffsetX, MapOffsetY, UiTextureAtlasMemberID, GarrSiteLevelPlotInstID, "
-        "GarrBuildingID, ID FROM garr_building_plot_inst ORDER BY ID DESC", CONNECTION_SYNCH);
-
-    // GarrClassSpec.db2
-    PrepareStatement(HOTFIX_SEL_GARR_CLASS_SPEC, "SELECT ClassSpec, ClassSpecMale, ClassSpecFemale, UiTextureAtlasMemberID, GarrFollItemSetID, "
-        "FollowerClassLimit, Flags, ID FROM garr_class_spec ORDER BY ID DESC", CONNECTION_SYNCH);
-    PREPARE_LOCALE_STMT(HOTFIX_SEL_GARR_CLASS_SPEC, "SELECT ID, ClassSpec_lang, ClassSpecMale_lang, ClassSpecFemale_lang FROM garr_class_spec_locale"
-        " WHERE locale = ?", CONNECTION_SYNCH);
-
-    // GarrFollower.db2
-    PrepareStatement(HOTFIX_SEL_GARR_FOLLOWER, "SELECT HordeSourceText, AllianceSourceText, TitleName, HordeCreatureID, AllianceCreatureID, "
-        "HordeIconFileDataID, AllianceIconFileDataID, HordeSlottingBroadcastTextID, AllySlottingBroadcastTextID, HordeGarrFollItemSetID, "
-        "AllianceGarrFollItemSetID, ItemLevelWeapon, ItemLevelArmor, HordeUITextureKitID, AllianceUITextureKitID, GarrFollowerTypeID, "
-        "HordeGarrFollRaceID, AllianceGarrFollRaceID, Quality, HordeGarrClassSpecID, AllianceGarrClassSpecID, FollowerLevel, Gender, Flags, "
-        "HordeSourceTypeEnum, AllianceSourceTypeEnum, GarrTypeID, Vitality, ChrClassID, HordeFlavorGarrStringID, AllianceFlavorGarrStringID, ID"
-        " FROM garr_follower ORDER BY ID DESC", CONNECTION_SYNCH);
-    PREPARE_LOCALE_STMT(HOTFIX_SEL_GARR_FOLLOWER, "SELECT ID, HordeSourceText_lang, AllianceSourceText_lang, TitleName_lang FROM garr_follower_locale"
-        " WHERE locale = ?", CONNECTION_SYNCH);
-
-    // GarrFollowerXAbility.db2
-    PrepareStatement(HOTFIX_SEL_GARR_FOLLOWER_X_ABILITY, "SELECT ID, GarrAbilityID, FactionIndex, GarrFollowerID FROM garr_follower_x_ability"
-        " ORDER BY ID DESC", CONNECTION_SYNCH);
-
-    // GarrPlot.db2
-    PrepareStatement(HOTFIX_SEL_GARR_PLOT, "SELECT ID, Name, AllianceConstructObjID, HordeConstructObjID, UiCategoryID, PlotType, Flags, "
-        "UpgradeRequirement1, UpgradeRequirement2 FROM garr_plot ORDER BY ID DESC", CONNECTION_SYNCH);
-    PREPARE_LOCALE_STMT(HOTFIX_SEL_GARR_PLOT, "SELECT ID, Name_lang FROM garr_plot_locale WHERE locale = ?", CONNECTION_SYNCH);
-
-    // GarrPlotBuilding.db2
-    PrepareStatement(HOTFIX_SEL_GARR_PLOT_BUILDING, "SELECT ID, GarrPlotID, GarrBuildingID FROM garr_plot_building ORDER BY ID DESC", CONNECTION_SYNCH);
-
-    // GarrPlotInstance.db2
-    PrepareStatement(HOTFIX_SEL_GARR_PLOT_INSTANCE, "SELECT ID, Name, GarrPlotID FROM garr_plot_instance ORDER BY ID DESC", CONNECTION_SYNCH);
-
-    // GarrSiteLevel.db2
-    PrepareStatement(HOTFIX_SEL_GARR_SITE_LEVEL, "SELECT ID, TownHallUiPosX, TownHallUiPosY, MapID, UiTextureKitID, UpgradeMovieID, UpgradeCost, "
-        "UpgradeGoldCost, GarrLevel, GarrSiteID, MaxBuildingLevel FROM garr_site_level ORDER BY ID DESC", CONNECTION_SYNCH);
-
-    // GarrSiteLevelPlotInst.db2
-    PrepareStatement(HOTFIX_SEL_GARR_SITE_LEVEL_PLOT_INST, "SELECT ID, UiMarkerPosX, UiMarkerPosY, GarrSiteLevelID, GarrPlotInstanceID, UiMarkerSize"
-        " FROM garr_site_level_plot_inst ORDER BY ID DESC", CONNECTION_SYNCH);
-
     // GemProperties.db2
     PrepareStatement(HOTFIX_SEL_GEM_PROPERTIES, "SELECT ID, Type, EnchantId, MinItemLevel FROM gem_properties ORDER BY ID DESC", CONNECTION_SYNCH);
 
