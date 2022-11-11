@@ -142,10 +142,9 @@ enum UnitFields
     UNIT_CREATED_BY_SPELL                                  = OBJECT_END + 0x070, // Size: 1, Flags: PUBLIC
     UNIT_NPC_FLAGS                                         = OBJECT_END + 0x071, // Size: 2, Flags: PUBLIC, DYNAMIC
     UNIT_NPC_EMOTESTATE                                    = OBJECT_END + 0x073, // Size: 1, Flags: PUBLIC
-    UNIT_FIELD_STAT                                        = OBJECT_END + 0x074, // Size: 4, Flags: PRIVATE, OWNER
-    //TODO
-    //UNIT_FIELD_TRAINING_POINTS_TOTAL                     = OBJECT_END + 0x077, // Size: 1, Flags: OWNER 
-    UNIT_FIELD_POSSTAT                                     = OBJECT_END + 0x078, // Size: 4, Flags: PRIVATE, OWNER
+    //UNIT_FIELD_TRAINING_POINTS_TOTAL                     = OBJECT_END + 0x074, // Size: 1, Flags: OWNER 
+    UNIT_FIELD_STAT                                        = OBJECT_END + 0x075, // Size: 4, Flags: PRIVATE, OWNER
+    UNIT_FIELD_POSSTAT                                     = OBJECT_END + 0x07A, // Size: 4, Flags: PRIVATE, OWNER
     UNIT_FIELD_NEGSTAT                                     = OBJECT_END + 0x07C, // Size: 4, Flags: PRIVATE, OWNER
     UNIT_FIELD_RESISTANCES                                 = OBJECT_END + 0x080, // Size: 7, Flags: PRIVATE, OWNER, SPECIAL_INFO
     UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE                  = OBJECT_END + 0x087, // Size: 7, Flags: PRIVATE, OWNER
@@ -227,8 +226,7 @@ enum PlayerFields
     PLAYER_FARSIGHT                                        = UNIT_END + 0x675, // Size: 4, Flags: PRIVATE
     PLAYER_FIELD_SUMMONED_BATTLE_PET_ID                    = UNIT_END + 0x679, // Size: 4, Flags: PRIVATE
     PLAYER__FIELD_KNOWN_TITLES                             = UNIT_END + 0x67D, // Size: 12, Flags: PRIVATE
-    //new 1.13
-    PLAYER_FIELD_COMBO_TARGET                              = UNIT_END + 0x689, // Size: 4, Flags: PUBLIC
+    PLAYER_FIELD_COMBO_TARGET                              = UNIT_END + 0x689, // Size: 4, Flags: PUBLIC 1.13 new
     PLAYER_FIELD_COINAGE                                   = UNIT_END + 0x68D, // Size: 2, Flags: PRIVATE
     PLAYER_XP                                              = UNIT_END + 0x68F, // Size: 1, Flags: PRIVATE
     PLAYER_NEXT_LEVEL_XP                                   = UNIT_END + 0x690, // Size: 1, Flags: PRIVATE
