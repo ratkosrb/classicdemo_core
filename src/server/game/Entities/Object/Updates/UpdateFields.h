@@ -142,7 +142,7 @@ enum UnitFields
     UNIT_CREATED_BY_SPELL                                  = OBJECT_END + 0x070, // Size: 1, Flags: PUBLIC
     UNIT_NPC_FLAGS                                         = OBJECT_END + 0x071, // Size: 2, Flags: PUBLIC, DYNAMIC
     UNIT_NPC_EMOTESTATE                                    = OBJECT_END + 0x073, // Size: 1, Flags: PUBLIC
-    CGUnitData::trainingPointsTotal                        = OBJECT_END + 0x074, // Size: 1, Flags: OWNER
+    CGUnitData_trainingPointsTotal                         = OBJECT_END + 0x074, // Size: 1, Flags: OWNER
     UNIT_FIELD_STAT                                        = OBJECT_END + 0x075, // Size: 5, Flags: PRIVATE, OWNER
     UNIT_FIELD_POSSTAT                                     = OBJECT_END + 0x07A, // Size: 5, Flags: PRIVATE, OWNER
     UNIT_FIELD_NEGSTAT                                     = OBJECT_END + 0x07F, // Size: 5, Flags: PRIVATE, OWNER
@@ -223,7 +223,7 @@ enum PlayerFields
     PLAYER_FIELD_INV_SLOT_HEAD                             = UNIT_END + 0x189, // Size: 780, Flags: PRIVATE
     PLAYER_FIELD_END_NOT_SELF                              = UNIT_END + 0x189,
     PLAYER_FARSIGHT                                        = UNIT_END + 0x495, // Size: 4, Flags: PRIVATE
-    CGPlayerData::local.comboTarget                        = UNIT_END + 0x499, // Size: 4, Flags: PRIVATE
+    CGPlayerData_local_comboTarget                         = UNIT_END + 0x499, // Size: 4, Flags: PRIVATE
     PLAYER_FIELD_SUMMONED_BATTLE_PET_ID                    = UNIT_END + 0x49D, // Size: 4, Flags: PRIVATE
     PLAYER__FIELD_KNOWN_TITLES                             = UNIT_END + 0x4A1, // Size: 12, Flags: PRIVATE
     PLAYER_FIELD_COINAGE                                   = UNIT_END + 0x4AD, // Size: 2, Flags: PRIVATE
@@ -277,7 +277,7 @@ enum PlayerFields
     PLAYER_FIELD_MOD_TARGET_PHYSICAL_RESISTANCE            = UNIT_END + 0x7F5, // Size: 1, Flags: PRIVATE
     PLAYER_FIELD_LOCAL_FLAGS                               = UNIT_END + 0x7F6, // Size: 1, Flags: PRIVATE
     PLAYER_FIELD_BYTES                                     = UNIT_END + 0x7F7, // Size: 1, Flags: PRIVATE
-    CGPlayerData::local.ammoID                             = UNIT_END + 0x7F8, // Size: 1, Flags: PRIVATE
+    CGPlayerData_local_ammoID                              = UNIT_END + 0x7F8, // Size: 1, Flags: PRIVATE
     PLAYER_FIELD_PVP_MEDALS                                = UNIT_END + 0x7F9, // Size: 1, Flags: PRIVATE
     PLAYER_FIELD_BUYBACK_PRICE_1                           = UNIT_END + 0x7FA, // Size: 12, Flags: PRIVATE
     PLAYER_FIELD_BUYBACK_TIMESTAMP_1                       = UNIT_END + 0x806, // Size: 12, Flags: PRIVATE
@@ -391,18 +391,20 @@ enum CorpseDynamicFields
 
 enum AreaTriggerFields
 {
-    AREATRIGGER_CASTER                                     = OBJECT_END + 0x000, // Size: 4, Flags: PUBLIC
-    AREATRIGGER_DURATION                                   = OBJECT_END + 0x004, // Size: 1, Flags: PUBLIC
-    AREATRIGGER_TIME_TO_TARGET                             = OBJECT_END + 0x005, // Size: 1, Flags: PUBLIC, URGENT
-    AREATRIGGER_TIME_TO_TARGET_SCALE                       = OBJECT_END + 0x006, // Size: 1, Flags: PUBLIC, URGENT
-    AREATRIGGER_TIME_TO_TARGET_EXTRA_SCALE                 = OBJECT_END + 0x007, // Size: 1, Flags: PUBLIC, URGENT
-    AREATRIGGER_SPELLID                                    = OBJECT_END + 0x008, // Size: 1, Flags: PUBLIC
-    AREATRIGGER_SPELL_FOR_VISUALS                          = OBJECT_END + 0x009, // Size: 1, Flags: PUBLIC
-    AREATRIGGER_SPELL_X_SPELL_VISUAL_ID                    = OBJECT_END + 0x00A, // Size: 1, Flags: PUBLIC
-    AREATRIGGER_BOUNDS_RADIUS_2D                           = OBJECT_END + 0x00B, // Size: 1, Flags: DYNAMIC, URGENT
-    AREATRIGGER_DECAL_PROPERTIES_ID                        = OBJECT_END + 0x00C, // Size: 1, Flags: PUBLIC
-    AREATRIGGER_CREATING_EFFECT_GUID                       = OBJECT_END + 0x00D, // Size: 4, Flags: PUBLIC
-    AREATRIGGER_END                                        = OBJECT_END + 0x011,
+    AREATRIGGER_OVERRIDE_SCALE_CURVE                       = OBJECT_END + 0x000, // Size: 7, Flags: PUBLIC, URGENT
+    AREATRIGGER_EXTRA_SCALE_CURVE                          = OBJECT_END + 0x007, // Size: 7, Flags: PUBLIC, URGENT
+    AREATRIGGER_CASTER                                     = OBJECT_END + 0x00E, // Size: 4, Flags: PUBLIC
+    AREATRIGGER_DURATION                                   = OBJECT_END + 0x012, // Size: 1, Flags: PUBLIC
+    AREATRIGGER_TIME_TO_TARGET                             = OBJECT_END + 0x013, // Size: 1, Flags: PUBLIC, URGENT
+    AREATRIGGER_TIME_TO_TARGET_SCALE                       = OBJECT_END + 0x014, // Size: 1, Flags: PUBLIC, URGENT
+    AREATRIGGER_TIME_TO_TARGET_EXTRA_SCALE                 = OBJECT_END + 0x015, // Size: 1, Flags: PUBLIC, URGENT
+    AREATRIGGER_SPELLID                                    = OBJECT_END + 0x016, // Size: 1, Flags: PUBLIC
+    AREATRIGGER_SPELL_FOR_VISUALS                          = OBJECT_END + 0x017, // Size: 1, Flags: PUBLIC
+    AREATRIGGER_SPELL_X_SPELL_VISUAL_ID                    = OBJECT_END + 0x018, // Size: 1, Flags: PUBLIC
+    AREATRIGGER_BOUNDS_RADIUS_2D                           = OBJECT_END + 0x019, // Size: 1, Flags: DYNAMIC, URGENT
+    AREATRIGGER_DECAL_PROPERTIES_ID                        = OBJECT_END + 0x01A, // Size: 1, Flags: PUBLIC
+    AREATRIGGER_CREATING_EFFECT_GUID                       = OBJECT_END + 0x01B, // Size: 4, Flags: PUBLIC
+    AREATRIGGER_END                                        = OBJECT_END + 0x01F,
 };
 
 enum AreaTriggerDynamicFields
