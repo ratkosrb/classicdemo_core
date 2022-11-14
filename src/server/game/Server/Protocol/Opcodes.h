@@ -817,7 +817,7 @@ enum OpcodeServer : uint16
     SMSG_AURA_POINTS_DEPLETED                         = 0x2C23,
     SMSG_AURA_UPDATE                                  = 0x2C22,
     SMSG_AUTH_CHALLENGE                               = 0x3048,
-    SMSG_AUTH_RESPONSE                                = 0x256C,
+    SMSG_AUTH_RESPONSE                                = 0x256C, 
     SMSG_AVAILABLE_HOTFIXES                           = 0x25A1,
     SMSG_BAN_REASON                                   = 0x26B2,
     SMSG_BARBER_SHOP_RESULT                           = 0x26E8,
@@ -854,7 +854,7 @@ enum OpcodeServer : uint16
     SMSG_BATTLE_PAY_PURCHASE_UPDATE                   = 0x27C4,
     SMSG_BATTLE_PAY_START_DISTRIBUTION_ASSIGN_TO_TARGET_RESPONSE = 0x27C2,
     SMSG_BATTLE_PAY_START_PURCHASE_RESPONSE           = 0x27C1,
-    SMSG_BATTLE_PAY_SUBSCRIPTION_CHANGED              = 0x2864,
+    SMSG_BATTLE_PAY_SUBSCRIPTION_CHANGED              = 0x285C, // new value
     SMSG_BATTLE_PAY_VAS_BNET_TRANSFER_VALIDATION_RESULT = 0x285B,
     SMSG_BATTLE_PAY_VAS_BOOST_CONSUMED                = 0x27B6,
     SMSG_BATTLE_PAY_VAS_CHARACTER_LIST                = 0x2830,
@@ -936,7 +936,7 @@ enum OpcodeServer : uint16
     SMSG_CHANNEL_NOTIFY_JOINED                        = 0x2BC1,
     SMSG_CHANNEL_NOTIFY_LEFT                          = 0x2BC2,
     SMSG_CHARACTER_CLASS_TRIAL_CREATE                 = 0x2804,
-    SMSG_CHARACTER_INVENTORY_OVERFLOW_WARNING         = 0x2863,
+    SMSG_CHARACTER_INVENTORY_OVERFLOW_WARNING         = 0x285B, // new value
     SMSG_CHARACTER_ITEM_FIXUP                         = 0x2854,
     SMSG_CHARACTER_LOGIN_FAILED                       = 0x2744,
     SMSG_CHARACTER_OBJECT_TEST_RESPONSE               = 0x27CC,
@@ -988,7 +988,7 @@ enum OpcodeServer : uint16
     SMSG_CORPSE_LOCATION                              = 0x266B,
     SMSG_CORPSE_RECLAIM_DELAY                         = 0x278E,
     SMSG_CORPSE_TRANSPORT_QUERY                       = 0x2751,
-    SMSG_CREATE_CHAR                                  = 0x273E,
+    SMSG_CREATE_CHAR                                  = 0x2738, //
     SMSG_CREATE_SHIPMENT_RESPONSE                     = 0x27DD,
     SMSG_CRITERIA_DELETED                             = 0x271D,
     SMSG_CRITERIA_UPDATE                              = 0x2717,
@@ -999,7 +999,7 @@ enum OpcodeServer : uint16
     SMSG_DB_REPLY                                     = 0x25A0,
     SMSG_DEATH_RELEASE_LOC                            = 0x2705,
     SMSG_DEFENSE_MESSAGE                              = 0x2BB6,
-    SMSG_DELETE_CHAR                                  = 0x273F,
+    SMSG_DELETE_CHAR                                  = 0x2739, //
     SMSG_DESTROY_ARENA_UNIT                           = 0x2784,
     SMSG_DESTRUCTIBLE_BUILDING_DAMAGE                 = 0x2732,
     SMSG_DIFFERENT_INSTANCE_FROM_PARTY                = 0x258A,
@@ -1198,7 +1198,7 @@ enum OpcodeServer : uint16
     SMSG_INSTANCE_ENCOUNTER_SET_SUPPRESSING_RELEASE   = 0x27F9,
     SMSG_INSTANCE_ENCOUNTER_START                     = 0x27F8,
     SMSG_INSTANCE_ENCOUNTER_TIMER_START               = 0x27F5,
-    SMSG_INSTANCE_GROUP_SIZE_CHANGED                  = 0x2736,
+    SMSG_INSTANCE_GROUP_SIZE_CHANGED                  = 0x272E, //
     SMSG_INSTANCE_INFO                                = 0x2650,
     SMSG_INSTANCE_RESET                               = 0x26AF,
     SMSG_INSTANCE_RESET_FAILED                        = 0x26B0,
@@ -1686,10 +1686,10 @@ enum OpcodeServer : uint16
     SMSG_UNLEARNED_SPELLS                             = 0x2C4E,
     SMSG_UPDATE_ACCOUNT_DATA                          = 0x2748,
     SMSG_UPDATE_ACTION_BUTTONS                        = 0x25F5,
-    SMSG_UPDATE_CELESTIAL_BODY                        = 0x285E,
+    SMSG_UPDATE_CELESTIAL_BODY                        = 0x2856,  // new value / old is - 0x285E
     SMSG_UPDATE_CHARACTER_FLAGS                       = 0x2806,
     SMSG_UPDATE_EXPANSION_LEVEL                       = 0x2663,
-    SMSG_UPDATE_GAME_TIME_STATE                       = 0x2865,
+    SMSG_UPDATE_GAME_TIME_STATE                       = 0x285D,  // new value 
     SMSG_UPDATE_INSTANCE_OWNERSHIP                    = 0x26D0,
     SMSG_UPDATE_LAST_INSTANCE                         = 0x26B1,
     SMSG_UPDATE_OBJECT                                = 0x280F,
