@@ -4,7 +4,6 @@
 
 enum UpdateFieldSizes : std::uint32_t
 {
-    //TODO Update to 1.13
     OBJECT_COUNT                = 12,
     OBJECT_DYNAMIC_COUNT        = 0,
     ITEM_COUNT                  = 73,
@@ -13,7 +12,7 @@ enum UpdateFieldSizes : std::uint32_t
     CONTAINER_DYNAMIC_COUNT     = 0,
     UNIT_COUNT                  = 201,
     UNIT_DYNAMIC_COUNT          = 3,
-    PLAYER_COUNT                = 4412,
+    PLAYER_COUNT                = 3936,
     PLAYER_DYNAMIC_COUNT        = 14,
     GAMEOBJECT_COUNT            = 21,
     GAMEOBJECT_DYNAMIC_COUNT    = 1,
@@ -21,7 +20,7 @@ enum UpdateFieldSizes : std::uint32_t
     DYNAMICOBJECT_DYNAMIC_COUNT = 0,
     CORPSE_COUNT                = 34,
     CORPSE_DYNAMIC_COUNT        = 0,
-    AREATRIGGER_COUNT           = 31,
+    AREATRIGGER_COUNT           = 17, //31 need to be right value todo
     AREATRIGGER_DYNAMIC_COUNT   = 0,
     SCENEOBJECT_COUNT           = 7,
     SCENEOBJECT_DYNAMIC_COUNT   = 0,
@@ -34,7 +33,7 @@ namespace Offsets
     std::uintptr_t const ObjectFields = 0x1A0B7E0; //
     std::uintptr_t const ItemFields = 0x1A0B900; //
     std::uintptr_t const ItemDynamicFields = 0x1A0BFF0; // +8 /
-    std::uintptr_t const ContainerFields = 0x1A0CDC0; //TODO Not showing ContainerFields Instead it show UnitFields
+    std::uintptr_t const ContainerFields = 0x1A0C040; //
     std::uintptr_t const UnitFields = 0x1A0CDE0; //
     std::uintptr_t const UnitDynamicFields = 0x1A0E118; // +8
     std::uintptr_t const PlayerFields = 0x1A0E150; //
